@@ -8,3 +8,10 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         console.log("Mensaje recibido en background:", message);
     })
 });
+
+chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
+    if (changeInfo.status === 'complete' && tab.active) {
+        // Recarga la vista del popup o de la extensión
+        chrome.runtime.sendMessage({ action: 'reloadPopup' });
+    }
+});

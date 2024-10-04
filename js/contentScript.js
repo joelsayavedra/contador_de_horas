@@ -60,7 +60,7 @@ fetch(`${window.location.href}&xml=T`)
         });
       }
 
-      console.log({ info });
+      // console.log({ info });
       chrome.runtime.sendMessage(info);
     }
   )

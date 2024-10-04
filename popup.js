@@ -21,6 +21,12 @@ let validaRegistroActual = async function(){
             const id = params.get('id')+""; // "value1"
             console.log({id, timesheets});
 
+            if (!id || id=='null') {
+                validRegister = false;
+                writeRecorStatus('Registro inválido');
+                return;
+            }
+
             let fecha = new Date;
             if (timesheets?.includes(id)) {
                 writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
@@ -32,12 +38,17 @@ let validaRegistroActual = async function(){
 }
 
 let updateLocalStorage = async function(data){
+    if (!data?.id) {
+        return;
+    }
     let timesheets = await cargaTimesheets() || [];
 
     if(!timesheets?.includes(data?.id)){
         timesheets.push(data?.id);
         chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
             console.log("Timsheets de storage actualizadas:", timesheets);
+            let fecha = new Date;
+            writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
         })
     }
 
@@ -259,10 +270,23 @@ function toggleDetalles(index) {
 // ----------------------------- EJECUCIÓN-- -----------------------------
 // -----------------------------------------------------------------------
 
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'reloadPopup') {
+        // Lógica para recargar o actualizar el popup
+        console.log('Recargando el popup...');
+        location.reload(); // Recargar el popup completamente
+    }
+});
+
 const TIMESHEETS = "addedTimesheets";
 const RECORD_INFO = "recordInfo";
 
+let validRegister = true;
+
 document.getElementById("actualizar").addEventListener("click", async function () {
+    if(!validRegister){
+        return;
+    }
 
     let data = await cargaRecordInfo();
 
