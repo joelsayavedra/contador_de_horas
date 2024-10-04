@@ -10,6 +10,25 @@
 //     });
 // });
 
+
+// chrome.tabs.query({ active: true, currentWindow: true }, async ([tab]) => {
+//     const response = await fetch(`${tab.url}&xml=T`,{credentials: 'include'});
+//     const data = await response.text();
+
+//     console.log('data', data);
+// });
+
+// chrome.tabs.executeScript({
+//     target: { tabId: tab.id },
+//     files: ['contentScript.js']
+// });
+
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    console.log("Mensaje recibido en el popup:", message);
+    // Aquí puedes procesar el mensaje recibido
+});
+
+
 // Array con los datos a insertar en la tabla, incluyendo detalles adicionales
 const data = [
     {

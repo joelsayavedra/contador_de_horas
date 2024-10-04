@@ -1,0 +1,303 @@
+This XML file does not appear to have any style information associated with it. The document tree is
+shown below.
+<nsResponse>
+    <record recordType="timesheet" id="104118" perm="4"
+        fields="_eml_nkey_,_multibtnstate_,selectedtab,nsapiPI,nsapiSR,nsapiVF,nsapiFC,nsapiPS,nsapiVI,nsapiVD,nsapiPD,nsapiVL,nsapiRC,nsapiLI,nsapiLC,nsapiCT,nsbrowserenv,wfPI,wfSR,wfVF,wfFC,wfPS,type,id,externalid,whence,customwhence,entryformquerystring,_csrf,wfinstances,employee,startdate,enddate,trandate,totalhours,approvalstatus,submittedhours,rejectedhours,plannedhours,allocatedhours,workcalendarhours,lockstatus,subsidiary,custrecord153,hourstotal0,hourstotal1,hourstotal2,hourstotal3,hourstotal4,hourstotal5,hourstotal6,hourstotal,hassupervisor,timelineidsOnLoad,timesheetnumdays,version,nluser,nlrole,nldept,nlloc,nlsub,baserecordtype,billingclass_employee,custpage_stick">
+        <_csrf>
+            p8vxCa_TPaCCSFxGISNItLk39AsnL0XGsvfmGGxmauMSdSjAHYjiOCBewwmsHJdvYSDq0g5iVpI0ZWMO46-GoMza0b9ka9_DHLGBcRbiuOhY56WplDftTlxi6eTcEZA2L51urhJn3jEsacp5aeSyPFfYlMQKfWn4ns7jqSVnYuo=</_csrf>
+        <_eml_nkey_>639296~75864~15~N</_eml_nkey_>
+        <allocatedhours>26.42817</allocatedhours>
+        <approvalstatus>1</approvalstatus>
+        <baserecordtype>timesheet</baserecordtype>
+        <employee>75864</employee>
+        <enddate>05/10/2024</enddate>
+        <entryformquerystring>id=104118&xml=T</entryformquerystring>
+        <hassupervisor>T</hassupervisor>
+        <hourstotal>19:00</hourstotal>
+        <hourstotal1>8:00</hourstotal1>
+        <hourstotal3>11:00</hourstotal3>
+        <id>104118</id>
+        <lockstatus>unlocked</lockstatus>
+        <nldept>43</nldept>
+        <nlloc>2</nlloc>
+        <nlrole>15</nlrole>
+        <nlsub>1</nlsub>
+        <nluser>75864</nluser>
+        <nsapiCT>1728016390105</nsapiCT>
+        <plannedhours>1938.4</plannedhours>
+        <rejectedhours>0</rejectedhours>
+        <startdate>29/09/2024</startdate>
+        <submittedhours>0</submittedhours>
+        <subsidiary>1</subsidiary>
+        <timelineidsOnLoad>3465898</timelineidsOnLoad>
+        <timelineidsOnLoad>3465899</timelineidsOnLoad>
+        <timelineidsOnLoad>3465900</timelineidsOnLoad>
+        <timelineidsOnLoad>3466994</timelineidsOnLoad>
+        <timelineidsOnLoad>3466995</timelineidsOnLoad>
+        <timelineidsOnLoad>3466996</timelineidsOnLoad>
+        <timelineidsOnLoad>3467041</timelineidsOnLoad>
+        <timesheetnumdays>7</timesheetnumdays>
+        <totalhours>19:00</totalhours>
+        <trandate>29/09/2024</trandate>
+        <type>timesheet</type>
+        <version>8</version>
+        <workcalendarhours>32</workcalendarhours>
+        <machine name="timeitem" type="edit"
+            fields="id,employeesub,customer,casetaskevent,custcol1,isproductive,custcol_timetiposoporte,custcol_taksnofacturable,price,rate,memo,rejectionnote,approvalstatus,department,custcol_mac_profile_time_entry,cseg_nslc_sujeto,custcol_nso_area_eslacada,custcol_nso_escalado,custcol_mac_time_exceeds_intake_per,custcol_mac_time_intake_exceeded,custcol_ss_tim_proyectorelacionadocli,custcol_ss_time_projectorelacionado,custcol_nso_billable_timetrack,custcol_nso_rejected_reason_timetrack,custcol_perfactcolumna,cseg_paactivitycode,billingclass,location,class,billingsubsidiary,timemodified,supervisorapproval,overriderate,timeofftype,isexempt,isutilized,isbillable,item,rejectionnote0,rejectionnote1,rejectionnote2,rejectionnote3,rejectionnote4,rejectionnote5,rejectionnote6,hassupervisor,hours0,timebill0,statushours0,billed0,posted0,hours1,timebill1,statushours1,billed1,posted1,hours2,timebill2,statushours2,billed2,posted2,hours3,timebill3,statushours3,billed3,posted3,hours4,timebill4,statushours4,billed4,posted4,hours5,timebill5,statushours5,billed5,posted5,hours6,timebill6,statushours6,billed6,posted6,hourstotal,editable,memo0,memo1,memo2,memo3,memo4,memo5,memo6,timetype,isbillableenabled,lastselectedbillable,internalemployee,custcol_o2s_imp_ret,custcol_o2s_transac_p_prov_part_icms,linechanged,linechanged0,linechanged1,linechanged2,linechanged3,linechanged4,linechanged5,linechanged6,importedline,projecttaskassignment">
+            <line>
+                <approvalstatus>1</approvalstatus>
+                <billed0>F</billed0>
+                <billed1>F</billed1>
+                <billed2>F</billed2>
+                <billed3>F</billed3>
+                <billed4>F</billed4>
+                <billed5>F</billed5>
+                <billed6>F</billed6>
+                <casetaskevent>1022441</casetaskevent>
+                <casetaskevent_display>6.1 Soporte a proyectos (Project Task)</casetaskevent_display>
+                <class>9</class>
+                <custcol1>1</custcol1>
+                <custcol_mac_time_exceeds_intake_per>F</custcol_mac_time_exceeds_intake_per>
+                <custcol_mac_time_intake_exceeded>F</custcol_mac_time_intake_exceeded>
+                <custcol_nso_billable_timetrack>F</custcol_nso_billable_timetrack>
+                <custcol_nso_escalado>F</custcol_nso_escalado>
+                <custcol_o2s_imp_ret>F</custcol_o2s_imp_ret>
+                <custcol_perfactcolumna>652</custcol_perfactcolumna>
+                <customer>58148</customer>
+                <customer_display>Netsoft / Cloudsuite Horas Internas</customer_display>
+                <department>43</department>
+                <department_display>OPERACIONES : DESARROLLO : INTEGRACIONES</department_display>
+                <editable>T</editable>
+                <employeesub>1</employeesub>
+                <hassupervisor>T</hassupervisor>
+                <hours1>1:00</hours1>
+                <hours3>1:00</hours3>
+                <hourstotal>2:00</hourstotal>
+                <id>3465899</id>
+                <importedline>F</importedline>
+                <internalemployee>75864</internalemployee>
+                <isbillable>F</isbillable>
+                <isbillableenabled>F</isbillableenabled>
+                <isexempt>F</isexempt>
+                <isproductive>T</isproductive>
+                <isutilized>T</isutilized>
+                <lastselectedbillable>F</lastselectedbillable>
+                <linechanged>F</linechanged>
+                <location>2</location>
+                <memo1>Revisión descarga masiva SAT Griver: El certificado está vencido, es
+                    necesario generar el archivo .pem nuevamente y modificar la instalación del
+                    cliente.</memo1>
+                <memo3>Revisión de error con Pinpad PErú, se solicitan logs del POS.</memo3>
+                <overriderate>F</overriderate>
+                <posted0>F</posted0>
+                <posted1>F</posted1>
+                <posted2>F</posted2>
+                <posted3>F</posted3>
+                <posted4>F</posted4>
+                <posted5>F</posted5>
+                <posted6>F</posted6>
+                <price>1</price>
+                <price_display>Base Price</price_display>
+                <projecttaskassignment>46131</projecttaskassignment>
+                <statushours1>1</statushours1>
+                <statushours3>1</statushours3>
+                <supervisorapproval>F</supervisorapproval>
+                <timebill1>3465899</timebill1>
+                <timebill3>3466994</timebill3>
+                <timemodified>F</timemodified>
+                <timetype>A</timetype>
+            </line>
+            <line>
+                <approvalstatus>1</approvalstatus>
+                <billed0>F</billed0>
+                <billed1>F</billed1>
+                <billed2>F</billed2>
+                <billed3>F</billed3>
+                <billed4>F</billed4>
+                <billed5>F</billed5>
+                <billed6>F</billed6>
+                <casetaskevent>2200459</casetaskevent>
+                <casetaskevent_display>1.4 Juntas Internas Avances/Seguimiento (Project Task)</casetaskevent_display>
+                <class>9</class>
+                <custcol1>1</custcol1>
+                <custcol_mac_time_exceeds_intake_per>F</custcol_mac_time_exceeds_intake_per>
+                <custcol_mac_time_intake_exceeded>F</custcol_mac_time_intake_exceeded>
+                <custcol_nso_billable_timetrack>F</custcol_nso_billable_timetrack>
+                <custcol_nso_escalado>F</custcol_nso_escalado>
+                <custcol_o2s_imp_ret>F</custcol_o2s_imp_ret>
+                <custcol_perfactcolumna>652</custcol_perfactcolumna>
+                <customer>58148</customer>
+                <customer_display>Netsoft / Cloudsuite Horas Internas</customer_display>
+                <department>43</department>
+                <department_display>OPERACIONES : DESARROLLO : INTEGRACIONES</department_display>
+                <editable>T</editable>
+                <employeesub>1</employeesub>
+                <hassupervisor>T</hassupervisor>
+                <hours1>0:30</hours1>
+                <hours3>1:00</hours3>
+                <hourstotal>1:30</hourstotal>
+                <id>3465898</id>
+                <importedline>F</importedline>
+                <internalemployee>75864</internalemployee>
+                <isbillable>F</isbillable>
+                <isbillableenabled>F</isbillableenabled>
+                <isexempt>F</isexempt>
+                <isproductive>T</isproductive>
+                <isutilized>T</isutilized>
+                <lastselectedbillable>F</lastselectedbillable>
+                <linechanged>F</linechanged>
+                <location>2</location>
+                <memo1>Revisióon integraciones</memo1>
+                <memo3>Revisión integraciones. Acompañamiento a consultoría, se muestra
+                    funcionamiento de desarrollo "OC_33196_Cambio en la generación del archivo
+                    file_store-information_netsuite_vent_"</memo3>
+                <overriderate>F</overriderate>
+                <posted0>F</posted0>
+                <posted1>F</posted1>
+                <posted2>F</posted2>
+                <posted3>F</posted3>
+                <posted4>F</posted4>
+                <posted5>F</posted5>
+                <posted6>F</posted6>
+                <price>1</price>
+                <price_display>Base Price</price_display>
+                <projecttaskassignment>52148</projecttaskassignment>
+                <statushours1>1</statushours1>
+                <statushours3>1</statushours3>
+                <supervisorapproval>F</supervisorapproval>
+                <timebill1>3465898</timebill1>
+                <timebill3>3466995</timebill3>
+                <timemodified>F</timemodified>
+                <timetype>A</timetype>
+            </line>
+            <line>
+                <approvalstatus>1</approvalstatus>
+                <billed0>F</billed0>
+                <billed1>F</billed1>
+                <billed2>F</billed2>
+                <billed3>F</billed3>
+                <billed4>F</billed4>
+                <billed5>F</billed5>
+                <billed6>F</billed6>
+                <billingclass>1</billingclass>
+                <casetaskevent>2831855</casetaskevent>
+                <casetaskevent_display>2.2 Desarrollo (Project Task)</casetaskevent_display>
+                <class>9</class>
+                <custcol1>1</custcol1>
+                <custcol_mac_time_exceeds_intake_per>F</custcol_mac_time_exceeds_intake_per>
+                <custcol_mac_time_intake_exceeded>F</custcol_mac_time_intake_exceeded>
+                <custcol_nso_billable_timetrack>F</custcol_nso_billable_timetrack>
+                <custcol_nso_escalado>F</custcol_nso_escalado>
+                <custcol_o2s_imp_ret>F</custcol_o2s_imp_ret>
+                <custcol_perfactcolumna>652</custcol_perfactcolumna>
+                <customer>109659</customer>
+                <customer_display>IX Comercio Chile SPA : Dev IX COMERCIO Convertir Tickets IX a
+                    Ticket</customer_display>
+                <department>43</department>
+                <department_display>OPERACIONES : DESARROLLO : INTEGRACIONES</department_display>
+                <editable>T</editable>
+                <employeesub>1</employeesub>
+                <hassupervisor>T</hassupervisor>
+                <hours1>6:30</hours1>
+                <hours3>8:00</hours3>
+                <hourstotal>14:30</hourstotal>
+                <id>3465900</id>
+                <importedline>F</importedline>
+                <internalemployee>75864</internalemployee>
+                <isbillable>F</isbillable>
+                <isbillableenabled>T</isbillableenabled>
+                <isexempt>F</isexempt>
+                <isproductive>T</isproductive>
+                <isutilized>T</isutilized>
+                <lastselectedbillable>F</lastselectedbillable>
+                <linechanged>F</linechanged>
+                <location>2</location>
+                <memo1>Se convierte El salvador a tipo data, se comprueba que el resultado en base
+                    64 sea exactamente igual a su versión ticket. Se inicia Ecuador.</memo1>
+                <memo3>Se agrega formateo secuencial, filas condicionales y formateo con locale. Se
+                    agregan tests de funciones de tabla, se agregan tests de ejemplos template
+                    generator. Se corrige bug al realizar textwrapping. Se agrega el resto de test
+                    de EjemplosTemplateGenerator.</memo3>
+                <overriderate>T</overriderate>
+                <posted0>F</posted0>
+                <posted1>F</posted1>
+                <posted2>F</posted2>
+                <posted3>F</posted3>
+                <posted4>F</posted4>
+                <posted5>F</posted5>
+                <posted6>F</posted6>
+                <price>-1</price>
+                <price_display>Custom</price_display>
+                <projecttaskassignment>171073</projecttaskassignment>
+                <rate>1600.00</rate>
+                <statushours1>1</statushours1>
+                <statushours3>1</statushours3>
+                <supervisorapproval>F</supervisorapproval>
+                <timebill1>3465900</timebill1>
+                <timebill3>3466996</timebill3>
+                <timemodified>F</timemodified>
+                <timetype>A</timetype>
+            </line>
+            <line>
+                <approvalstatus>1</approvalstatus>
+                <billed0>F</billed0>
+                <billed1>F</billed1>
+                <billed2>F</billed2>
+                <billed3>F</billed3>
+                <billed4>F</billed4>
+                <billed5>F</billed5>
+                <billed6>F</billed6>
+                <billingclass>1</billingclass>
+                <casetaskevent>2820533</casetaskevent>
+                <casetaskevent_display>5.3 Pase a producción (Project Task)</casetaskevent_display>
+                <class>9</class>
+                <custcol1>1</custcol1>
+                <custcol_mac_time_exceeds_intake_per>F</custcol_mac_time_exceeds_intake_per>
+                <custcol_mac_time_intake_exceeded>F</custcol_mac_time_intake_exceeded>
+                <custcol_nso_billable_timetrack>F</custcol_nso_billable_timetrack>
+                <custcol_nso_escalado>F</custcol_nso_escalado>
+                <custcol_o2s_imp_ret>F</custcol_o2s_imp_ret>
+                <custcol_perfactcolumna>652</custcol_perfactcolumna>
+                <customer>109138</customer>
+                <customer_display>IX Comercio Chile SPA : Dev IX COMERCIO Ajustes a tickets</customer_display>
+                <department>43</department>
+                <department_display>OPERACIONES : DESARROLLO : INTEGRACIONES</department_display>
+                <editable>T</editable>
+                <employeesub>1</employeesub>
+                <hassupervisor>T</hassupervisor>
+                <hours3>1:00</hours3>
+                <hourstotal>1:00</hourstotal>
+                <id>3467041</id>
+                <importedline>F</importedline>
+                <internalemployee>75864</internalemployee>
+                <isbillable>F</isbillable>
+                <isbillableenabled>T</isbillableenabled>
+                <isexempt>F</isexempt>
+                <isproductive>T</isproductive>
+                <isutilized>T</isutilized>
+                <lastselectedbillable>F</lastselectedbillable>
+                <linechanged>F</linechanged>
+                <location>2</location>
+                <memo3>Pase a producción, modificación de jar a petición de Cristian Navarro. Se
+                    envía versión con los cambios a QA.</memo3>
+                <overriderate>T</overriderate>
+                <posted0>F</posted0>
+                <posted1>F</posted1>
+                <posted2>F</posted2>
+                <posted3>F</posted3>
+                <posted4>F</posted4>
+                <posted5>F</posted5>
+                <posted6>F</posted6>
+                <price>-1</price>
+                <price_display>Custom</price_display>
+                <projecttaskassignment>169194</projecttaskassignment>
+                <rate>1600.00</rate>
+                <statushours3>1</statushours3>
+                <supervisorapproval>F</supervisorapproval>
+                <timebill3>3467041</timebill3>
+                <timemodified>F</timemodified>
+                <timetype>A</timetype>
+            </line>
+        </machine>
+    </record>
+</nsResponse>
