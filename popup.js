@@ -1,16 +1,72 @@
-document.getElementById("actualizar").addEventListener("click", function () {
-    chrome.storage.local.get("recordInfo", (result) => {
-        if (result?.recordInfo) {
-            let data = result?.recordInfo;
-            console.log("Datos recuperados del storage:", data);
-    
-            generarTabla(data);
-            
-        } else {
-            console.log("No se encontraron datos almacenados.");
+// -----------------------------------------------------------------------
+// ------------------------------- FUNCIONES -----------------------------
+// -----------------------------------------------------------------------
+let writeRecorStatus = async function(message){
+    document.getElementById("recordStatus").textContent = message;
+}
+
+
+
+let validaRegistroActual = async function(){
+    let timesheets = await cargaTimesheets();
+
+
+    let urlString = "";
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs.length > 0) {
+
+            urlString = tabs[0].url;
+            const url = new URL(urlString);
+            const params = url.searchParams;
+            const id = params.get('id')+""; // "value1"
+            console.log({id, timesheets});
+
+            let fecha = new Date;
+            if (timesheets?.includes(id)) {
+                writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
+            }else{
+                writeRecorStatus('Este registro no se ha contabilizado');
+            }
         }
     });
-});
+}
+
+let updateLocalStorage = async function(data){
+    let timesheets = await cargaTimesheets() || [];
+
+    if(!timesheets?.includes(data?.id)){
+        timesheets.push(data?.id);
+        chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
+            console.log("Timsheets de storage actualizadas:", timesheets);
+        })
+    }
+
+};
+
+let cargaTimesheets = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(TIMESHEETS, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[TIMESHEETS]);
+            }
+        });
+    });
+}
+let cargaRecordInfo = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(RECORD_INFO, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[RECORD_INFO]);
+            }
+        });
+    });
+}
+
+
 
 function sumarHoras(hora1, hora2) {
     // Separar las horas y minutos
@@ -196,3 +252,49 @@ function toggleDetalles(index) {
         detallesRow.style.display = "none"; // Ocultar detalles
     }
 }
+
+
+
+// -----------------------------------------------------------------------
+// ----------------------------- EJECUCIÓN-- -----------------------------
+// -----------------------------------------------------------------------
+
+const TIMESHEETS = "addedTimesheets";
+const RECORD_INFO = "recordInfo";
+
+document.getElementById("actualizar").addEventListener("click", async function () {
+
+    let data = await cargaRecordInfo();
+
+    console.log("Datos recuperados del storage:", data);
+
+    // let groupedData = getGroupedData();
+
+    updateLocalStorage(data);
+
+    generarTabla(data);
+
+});
+
+
+// Valida si la hoja actual ya se contabilizó
+validaRegistroActual();
+
+
+
+
+
+
+
+// function eliminarDato(clave) {
+//     chrome.storage.local.remove(clave, () => {
+//         if (chrome.runtime.lastError) {
+//             console.error("Error al eliminar el dato:", chrome.runtime.lastError);
+//         } else {
+//             console.log(`Dato con la clave '${clave}' ha sido eliminado.`);
+//         }
+//     });
+// }
+
+// // Llamar a la función para eliminar un dato
+// eliminarDato(TIMESHEETS);
