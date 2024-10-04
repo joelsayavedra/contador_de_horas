@@ -56,10 +56,12 @@ fetch(`${window.location.href}&xml=T`)
           memo5: linea.getElementsByTagName('memo5')?.[0]?.textContent,
           memo6: linea.getElementsByTagName('memo6')?.[0]?.textContent,
           memo7: linea.getElementsByTagName('memo7')?.[0]?.textContent,
+          id: linea.getElementsByTagName('id')?.[0]?.textContent,
         });
       }
 
       console.log({ info });
+      chrome.runtime.sendMessage(info);
     }
   )
   .catch(error => console.error('Error:', error));

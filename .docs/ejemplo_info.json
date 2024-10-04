@@ -1,0 +1,58 @@
+{
+    "lineas": [
+        {
+            "casetaskevent": "1022441",
+            "casetaskevent_display": "6.1 Soporte a proyectos (Project Task)",
+            "customer": "58148",
+            "customer_display": "Netsoft / Cloudsuite Horas Internas",
+            "hours1": "1:00",
+            "hours3": "1:00",
+            "hourstotal": "2:00",
+            "memo1": "Revisión descarga masiva SAT Griver: El certificado está vencido, es necesario generar el archivo .pem nuevamente y modificar la instalación del cliente.",
+            "memo3": "Revisión de error con Pinpad PErú, se solicitan logs del POS.",
+            "id": "3465899"
+        },
+        {
+            "casetaskevent": "2200459",
+            "casetaskevent_display": "1.4 Juntas Internas Avances/Seguimiento (Project Task)",
+            "customer": "58148",
+            "customer_display": "Netsoft / Cloudsuite Horas Internas",
+            "hours1": "0:30",
+            "hours3": "1:00",
+            "hourstotal": "1:30",
+            "memo1": "Revisióon integraciones",
+            "memo3": "Revisión integraciones.\nAcompañamiento a consultoría, se muestra funcionamiento de desarrollo \"OC_33196_Cambio en la generación del archivo file_store-information_netsuite_vent_\"",
+            "id": "3465898"
+        },
+        {
+            "casetaskevent": "2831855",
+            "casetaskevent_display": "2.2 Desarrollo (Project Task)",
+            "customer": "109659",
+            "customer_display": "IX Comercio Chile SPA : Dev IX COMERCIO Convertir Tickets IX a Ticket",
+            "hours1": "6:30",
+            "hours3": "8:00",
+            "hourstotal": "14:30",
+            "memo1": "Se convierte El salvador a tipo data, se comprueba que el resultado en base 64 sea exactamente igual a su versión ticket. Se inicia Ecuador.",
+            "memo3": "Se agrega formateo secuencial, filas condicionales y formateo con locale.\nSe agregan tests de funciones de tabla, se agregan tests de ejemplos template generator.\nSe corrige bug al realizar textwrapping. Se agrega el resto de test de EjemplosTemplateGenerator.",
+            "id": "3465900"
+        },
+        {
+            "casetaskevent": "2820533",
+            "casetaskevent_display": "5.3 Pase a producción (Project Task)",
+            "customer": "109138",
+            "customer_display": "IX Comercio Chile SPA : Dev IX COMERCIO Ajustes a tickets",
+            "hours3": "1:00",
+            "hourstotal": "1:00",
+            "memo3": "Pase a producción, modificación de jar a petición de Cristian Navarro. Se envía versión con los cambios a QA.",
+            "id": "3467041"
+        }
+    ],
+    "workcalendarhours": "32",
+    "enddate": "05/10/2024",
+    "hourstotal": "19:00",
+    "hourstotal1": "8:00",
+    "hourstotal3": "11:00",
+    "id": "104118",
+    "startdate": "29/09/2024",
+    "type": "timesheet"
+}

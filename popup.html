@@ -6,9 +6,9 @@
     <title>Mi Extensión</title>
     <style>
         table {
-            width: 50%;
+            width: 100%;
             border-collapse: collapse;
-            margin: 10px 10px;
+            margin: 0px 0px;
             font-size: 12px;
             text-align: left;
         }
@@ -26,39 +26,49 @@
         /* Estilo para los detalles que se ocultan */
         .detalles {
             display: none;
-            background-color: #f9f9f9;
-            font-size: 12px;
+            background-color: #bbbad12c;
+            font-size: 12px !important; 
         }
 
-        .detalles td {
-            padding: 8px;
+        .detalles th {
+            padding: 2px;
+            background-color: #bbbad13f;
+        }
+
+        body {
+            width: 600px;
+            /* Define el ancho del popup */
+            height: 400px;
+            /* Define la altura del popup */
+            margin: 10px;
+            padding: 10px;
+            font-family: Arial, sans-serif;
         }
     </style>
 </head>
 
 <body>
     <style></style>
-    <h2>Contador de horas - Netsoft</h1>
-    <h3>Creado por JEST</h1>
+    <h2>Contador de horas - Netsoft</h2>
+    <h3>Creado por JEST</h3>
     <p>El registro actual se contabilizó el: </p>
     <p>El registro actual no se ha contabilizado: </p>
     <button id="actualizar">Actualizar conteo con registro actual</button>
 
     <table id="miTabla">
-        <table id="miTabla">
-            <thead>
-                <tr>
-                    <th>Cliente</th>
-                    <th>Task</th>
-                    <th>Acción</th>
-                </tr>
-            </thead>
-            <tbody>
-                <!-- Filas generadas dinámicamente -->
-            </tbody>
-        </table>
+        <thead>
+            <tr>
+                <th>Cliente / Proyecto</th>
+                <th>Horas totales</th>
+                <th>Desglose</th>
+            </tr>
+        </thead>
+        <tbody>
+            <!-- Filas generadas dinámicamente -->
+        </tbody>
+    </table>
 
-        <script src="popup.js"></script>
+    <script src="popup.js"></script>
 </body>
 
 </html>

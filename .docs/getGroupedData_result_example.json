@@ -1,0 +1,51 @@
+{
+    "clientesDict": {
+        "58148": "Netsoft / Cloudsuite Horas Internas",
+        "109138": "IX Comercio Chile SPA : Dev IX COMERCIO Ajustes a tickets",
+        "109659": "IX Comercio Chile SPA : Dev IX COMERCIO Convertir Tickets IX a Ticket"
+    },
+    "tasksDict": {
+        "1022441": "6.1 Soporte a proyectos (Project Task)",
+        "2200459": "1.4 Juntas Internas Avances/Seguimiento (Project Task)",
+        "2820533": "5.3 Pase a producción (Project Task)",
+        "2831855": "2.2 Desarrollo (Project Task)"
+    },
+    "desglose": {
+        "id": "104118",
+        "workcalendarhours": "32",
+        "enddate": "05/10/2024",
+        "hourstotal": "19:00",
+        "startdate": "29/09/2024",
+        "clientes": {
+            "58148": {
+                "tasks": {
+                    "1022441": {
+                        "t": "2:00"
+                    },
+                    "2200459": {
+                        "t": "1:30"
+                    }
+                }
+            },
+            "109138": {
+                "tasks": {
+                    "2820533": {
+                        "t": "1:00"
+                    }
+                }
+            },
+            "109659": {
+                "tasks": {
+                    "2831855": {
+                        "t": "14:30"
+                    }
+                }
+            }
+        }
+    },
+    "totalPorCliente": {
+        "58148": "03:30",
+        "109138": "01:00",
+        "109659": "14:30"
+    }
+}
