@@ -1,51 +1,77 @@
 {
     "clientesDict": {
         "58148": "Netsoft / Cloudsuite Horas Internas",
-        "109138": "IX Comercio Chile SPA : Dev IX COMERCIO Ajustes a tickets",
+        "105067": "Tecnologia especializa Asociada de Mexico SA de CV : Dev Team Adecuación en integración AUTODESK",
+        "105238": "IX Comercio Chile SPA : Dev IX COMERCIO PINPAD ECUADOR",
+        "109003": "IX Comercio Chile SPA : Dev IX COMERCIO OC_33196_Cambio en la generación",
         "109659": "IX Comercio Chile SPA : Dev IX COMERCIO Convertir Tickets IX a Ticket"
     },
     "tasksDict": {
         "1022441": "6.1 Soporte a proyectos (Project Task)",
         "2200459": "1.4 Juntas Internas Avances/Seguimiento (Project Task)",
-        "2820533": "5.3 Pase a producción (Project Task)",
+        "2720640": "5.3 Pase a producción (Project Task)",
+        "2726334": "2.2 Desarrollo (Project Task)",
+        "2726337": "3.1 Entrega a QA (Project Task)",
+        "2814547": "2.2 Desarrollo (Project Task)",
+        "2814548": "2.3 Generación de documento (Project Task)",
         "2831855": "2.2 Desarrollo (Project Task)"
     },
     "desglose": {
-        "id": "104118",
-        "workcalendarhours": "32",
-        "enddate": "05/10/2024",
-        "hourstotal": "19:00",
-        "startdate": "29/09/2024",
+        "id": "103712",
+        "workcalendarhours": "40",
+        "enddate": "28/09/2024",
+        "hourstotal": "41:30",
+        "startdate": "22/09/2024",
         "clientes": {
             "58148": {
                 "tasks": {
                     "1022441": {
-                        "t": "2:00"
+                        "t": "3:00"
                     },
                     "2200459": {
+                        "t": "4:30"
+                    }
+                },
+                "total": "07:30"
+            },
+            "105067": {
+                "tasks": {
+                    "2720640": {
                         "t": "1:30"
                     }
-                }
+                },
+                "total": "01:30"
             },
-            "109138": {
+            "105238": {
                 "tasks": {
-                    "2820533": {
+                    "2726334": {
+                        "t": "4:00"
+                    },
+                    "2726337": {
+                        "t": "6:00"
+                    }
+                },
+                "total": "10:00"
+            },
+            "109003": {
+                "tasks": {
+                    "2814547": {
+                        "t": "5:30"
+                    },
+                    "2814548": {
                         "t": "1:00"
                     }
-                }
+                },
+                "total": "06:30"
             },
             "109659": {
                 "tasks": {
                     "2831855": {
-                        "t": "14:30"
+                        "t": "16:00"
                     }
-                }
+                },
+                "total": "16:00"
             }
         }
-    },
-    "totalPorCliente": {
-        "58148": "03:30",
-        "109138": "01:00",
-        "109659": "14:30"
     }
 }

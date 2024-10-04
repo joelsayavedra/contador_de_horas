@@ -5,6 +5,37 @@ let writeRecorStatus = async function(message){
     document.getElementById("recordStatus").textContent = message;
 }
 
+let getGrandTotal = function(recordsData){
+    let grandTotal = {};
+
+    recordsData.forEach(record => {
+        let clientes = record.clientes;
+        Object.keys(clientes).forEach(clienteKey => {
+            let cliente = clientes[clienteKey];
+            if(!grandTotal[clienteKey]){
+                grandTotal[clienteKey] = cliente;
+            }else{
+                // Suma totales por cliente
+                grandTotal[clienteKey].total = sumarHoras(grandTotal[clienteKey].total, cliente.total);
+
+                // Combina tasks
+                let tasks = cliente?.tasks;
+                Object.keys(tasks).forEach(taksKey => {
+                    let task = tasks[taksKey];
+                    if(!grandTotal[clienteKey].tasks[taksKey]){
+                        grandTotal[clienteKey].tasks[taksKey] = task;
+                    }else{
+                        // Suma total de task
+                        grandTotal[clienteKey].tasks[taksKey].t = sumarHoras(grandTotal[clienteKey].tasks[taksKey].t, task.t);
+                    }
+                });
+
+            }
+        });
+    });
+    
+    return grandTotal;
+}
 
 
 let validaRegistroActual = async function(){
@@ -22,49 +53,77 @@ let validaRegistroActual = async function(){
             console.log({id, timesheets});
 
             if (!id || id=='null') {
-                validRegister = false;
-                writeRecorStatus('Registro inválido');
+                validRecord = false;
+                writeRecorStatus('Invalid record');
                 return;
             }
 
             let fecha = new Date;
             if (timesheets?.includes(id)) {
-                writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
+                writeRecorStatus('Record already counted');
+                // writeRecorStatus('Record already counted ('+fecha.toUTCString()+')');
             }else{
-                writeRecorStatus('Este registro no se ha contabilizado');
+                writeRecorStatus('This record has not been added');
             }
         }
     });
 }
 
 let updateLocalStorage = async function(data){
-    if (!data?.id) {
+    if (!data?.id || data.id=='null') {
         return;
     }
-    let timesheets = await cargaTimesheets() || [];
 
+    let timesheets = await cargaTimesheets() || [];
+    let recordsData = await cargaRecordsData() || [];
+    let clientesDict = await cargaClientesDict() || {};
+    let tasksDict = await cargaTasksDict() || {};
+    let groupedData = getGroupedData(data);
+
+    console.log({
+        timesheets,
+        recordsData,
+        clientesDict,
+        tasksDict,
+        groupedData,
+    });
+
+    
+    // Actualiza ids de timesheets
+    // agrega el id si no existe
     if(!timesheets?.includes(data?.id)){
+        // TODO: Agregar fecha
         timesheets.push(data?.id);
-        chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
-            console.log("Timsheets de storage actualizadas:", timesheets);
-            let fecha = new Date;
-            writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
-        })
     }
+    chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
+        console.log("Timsheets de storage actualizadas:", timesheets);
+        let fecha = new Date;
+        writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
+    });
+    
+    // Elimina el detalle anterior
+    if(timesheets?.includes(data?.id)){
+        recordsData = recordsData.filter(objeto => objeto.id !== data?.id);
+    }
+    recordsData.push(groupedData?.desglose);
+    // Actualiza información detallada de la timesheet
+    chrome.storage.local.set({[RECORDS_DATA]:recordsData},()=>{
+        console.log("Detalles de transacciones actualizados:", recordsData);
+    });
+    
+    // Actualiza diccionarios
+    clientesDict = {...clientesDict, ...groupedData?.clientesDict};
+    tasksDict = {...tasksDict, ...groupedData?.tasksDict};
+    chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
+        console.log("Diccionario de clientes actualizado:", clientesDict);
+    });
+    chrome.storage.local.set({[TASKS_DICT]:tasksDict},()=>{
+        console.log("Diccionario de tareas actualizado:", tasksDict);
+    });
+
 
 };
 
-let cargaTimesheets = async function(){
-    return new Promise((resolve, reject) => {
-        chrome.storage.local.get(TIMESHEETS, (result) => {
-            if (chrome.runtime.lastError) {
-                reject(chrome.runtime.lastError);
-            } else {
-                resolve(result[TIMESHEETS]);
-            }
-        });
-    });
-}
 let cargaRecordInfo = async function(){
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(RECORD_INFO, (result) => {
@@ -76,8 +135,50 @@ let cargaRecordInfo = async function(){
         });
     });
 }
-
-
+let cargaTimesheets = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(TIMESHEETS, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[TIMESHEETS]);
+            }
+        });
+    });
+}
+let cargaRecordsData = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(RECORDS_DATA, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[RECORDS_DATA]);
+            }
+        });
+    });
+}
+let cargaClientesDict = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(CLIENTES_DICT, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[CLIENTES_DICT]);
+            }
+        });
+    });
+}
+let cargaTasksDict = async function(){
+    return new Promise((resolve, reject) => {
+        chrome.storage.local.get(TASKS_DICT, (result) => {
+            if (chrome.runtime.lastError) {
+                reject(chrome.runtime.lastError);
+            } else {
+                resolve(result[TASKS_DICT]);
+            }
+        });
+    });
+}
 
 function sumarHoras(hora1, hora2) {
     // Separar las horas y minutos
@@ -100,6 +201,17 @@ function sumarHoras(hora1, hora2) {
 
 let getGroupedData = function (data) {
     try {
+        const totalPorCliente = data.lineas.reduce(
+            (acumulador, { customer, hourstotal }) => {
+                if (!acumulador[customer]) {
+                    acumulador[customer] = '00:00';
+                }
+                acumulador[customer] = sumarHoras(acumulador[customer], hourstotal);
+                return acumulador;
+            },
+            {}
+        );
+
         let clientesDict = {};
         let tasksDict = {};
         let desglose = {
@@ -130,6 +242,7 @@ let getGroupedData = function (data) {
                             t: linea?.hourstotal
                         },
                     },
+                    total: totalPorCliente[customer]
                 };
             } else {
                 if (!desglose.clientes[customer]?.tasks?.[task]) {
@@ -140,22 +253,12 @@ let getGroupedData = function (data) {
             }
         });
 
-        const totalPorCliente = data.lineas.reduce(
-            (acumulador, { customer, hourstotal }) => {
-                if (!acumulador[customer]) {
-                    acumulador[customer] = '00:00';
-                }
-                acumulador[customer] = sumarHoras(acumulador[customer], hourstotal);
-                return acumulador;
-            },
-            {}
-        );
+        
 
         return {
             clientesDict,
             tasksDict,
-            desglose,
-            totalPorCliente
+            desglose
         };
     } catch (error) {
         console.error("Error getGroupedData: " + error);
@@ -163,18 +266,16 @@ let getGroupedData = function (data) {
 }
 
 // Función para generar la tabla dinámica
-function generarTabla(data) {
+async function generarTabla() {
     const tableBody = document.querySelector("#miTabla tbody");
 
     // Limpiar el contenido previo de la tabla
     tableBody.innerHTML = "";
 
-    let groupedData = getGroupedData(data);
-    console.log({groupedData});
-    let clientes = groupedData.desglose.clientes;
-    let clientesDict = groupedData.clientesDict;
-    let tasksDict = groupedData.tasksDict;
-    let totalPorCliente = groupedData.totalPorCliente;
+    let recordsData = await cargaRecordsData() || [];
+    let clientesDict = await cargaClientesDict() || {};
+    let tasksDict = await cargaTasksDict() || {};
+    let clientes = getGrandTotal(recordsData);
 
     // Recorrer el array de datos y generar las filas de la tabla
     Object.keys(clientes).forEach((cliente, index) => {
@@ -186,13 +287,13 @@ function generarTabla(data) {
         cellCliente.textContent = clientesDict[cliente];
         row.appendChild(cellCliente);
         const cellTotal = document.createElement("td");
-        cellTotal.textContent = totalPorCliente[cliente];
+        cellTotal.textContent = clientes[cliente]?.total;
         row.appendChild(cellTotal);
 
         // Agregar celda con botón para desplegar detalles
         const accionCell = document.createElement("td");
         const boton = document.createElement("button");
-        boton.textContent = "Detalles";
+        boton.textContent = "Detail";
         boton.onclick = () => toggleDetalles(index); // Llama a la función para mostrar detalles
         accionCell.appendChild(boton);
         row.appendChild(accionCell);
@@ -214,7 +315,7 @@ function generarTabla(data) {
         const subHeader1 = document.createElement('th');
         subHeader1.textContent = 'Case/Task/Event';
         const subHeader2 = document.createElement('th');
-        subHeader2.textContent = 'Horas invertidas';
+        subHeader2.textContent = 'Time spent';
 
         innerHeaderRow.appendChild(subHeader1);
         innerHeaderRow.appendChild(subHeader2);
@@ -278,13 +379,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-const TIMESHEETS = "addedTimesheets";
 const RECORD_INFO = "recordInfo";
+const TIMESHEETS = "addedTimesheets";
+const RECORDS_DATA = "recordsData";
+const CLIENTES_DICT = "clientesDict";
+const TASKS_DICT = "tasksDict";
 
-let validRegister = true;
+let validRecord = true;
 
 document.getElementById("actualizar").addEventListener("click", async function () {
-    if(!validRegister){
+    if(!validRecord){
         return;
     }
 
@@ -294,15 +398,21 @@ document.getElementById("actualizar").addEventListener("click", async function (
 
     // let groupedData = getGroupedData();
 
-    updateLocalStorage(data);
+    await updateLocalStorage(data);
 
-    generarTabla(data);
-
+    location.reload(); // Recargar el popup completamente
 });
 
+let main = async function(){
+    await validaRegistroActual();
+    await generarTabla();
+
+}
+
+
+main();
 
 // Valida si la hoja actual ya se contabilizó
-validaRegistroActual();
 
 
 
@@ -322,3 +432,6 @@ validaRegistroActual();
 
 // // Llamar a la función para eliminar un dato
 // eliminarDato(TIMESHEETS);
+// eliminarDato(RECORDS_DATA);
+// eliminarDato(CLIENTES_DICT);
+// eliminarDato(TASKS_DICT);
