@@ -353,7 +353,7 @@ async function generarTabla() {
     });
 }
 
-function toggleDetalles(index) {
+let toggleDetalles = function(index) {
     const detallesRows = document.querySelectorAll(".detalles");
     const detallesRow = detallesRows[index];
 
@@ -365,11 +365,23 @@ function toggleDetalles(index) {
     }
 }
 
-
-
 // -----------------------------------------------------------------------
 // ----------------------------- EJECUCIÓN-- -----------------------------
 // -----------------------------------------------------------------------
+
+const grandTotalView = document.getElementById('grandTotalView');
+const timesheetsView = document.getElementById('timesheetsView');
+const projectsView = document.getElementById('projectsView');
+const aboutView = document.getElementById('aboutView');
+const grandTotalButton = document.getElementById('grandTotalButton');
+const timesheetsButton = document.getElementById('timesheetsButton');
+const projectsButton = document.getElementById('projectsButton');
+const aboutButton = document.getElementById('aboutButton');
+
+grandTotalView.style.display = 'block';
+timesheetsView.style.display = 'none';
+projectsView.style.display = 'none';
+aboutView.style.display = 'none';
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.action === 'reloadPopup') {
@@ -377,6 +389,50 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         console.log('Recargando el popup...');
         location.reload(); // Recargar el popup completamente
     }
+});
+
+grandTotalButton.addEventListener('click', function () {
+    grandTotalView.style.display = 'block';
+    timesheetsView.style.display = 'none';
+    projectsView.style.display = 'none';
+    aboutView.style.display = 'none';
+    grandTotalButton.classList.add('active');
+    timesheetsButton.classList.remove('active');
+    projectsButton.classList.remove('active');
+    aboutButton.classList.remove('active');
+});
+
+timesheetsButton.addEventListener('click', function () {
+    grandTotalView.style.display = 'none';
+    timesheetsView.style.display = 'block';
+    projectsView.style.display = 'none';
+    aboutView.style.display = 'none';
+    grandTotalButton.classList.remove('active');
+    timesheetsButton.classList.add('active');
+    projectsButton.classList.remove('active');
+    aboutButton.classList.remove('active');
+});
+
+projectsButton.addEventListener('click', function () {
+    grandTotalView.style.display = 'none';
+    timesheetsView.style.display = 'none';
+    projectsView.style.display = 'block';
+    aboutView.style.display = 'none';
+    grandTotalButton.classList.remove('active');
+    timesheetsButton.classList.remove('active');
+    projectsButton.classList.add('active');
+    aboutButton.classList.remove('active');
+});
+
+aboutButton.addEventListener('click', function () {
+    grandTotalView.style.display = 'none';
+    timesheetsView.style.display = 'none';
+    projectsView.style.display = 'none';
+    aboutView.style.display = 'block';
+    grandTotalButton.classList.remove('active');
+    timesheetsButton.classList.remove('active');
+    projectsButton.classList.remove('active');
+    aboutButton.classList.add('active');
 });
 
 const RECORD_INFO = "recordInfo";
@@ -400,7 +456,7 @@ document.getElementById("actualizar").addEventListener("click", async function (
 
     await updateLocalStorage(data);
 
-    location.reload(); // Recargar el popup completamente
+    // location.reload(); // DEBUG: Recargar el popup completamente 
 });
 
 let main = async function(){
@@ -410,13 +466,8 @@ let main = async function(){
 }
 
 
+
 main();
-
-// Valida si la hoja actual ya se contabilizó
-
-
-
-
 
 
 
