@@ -72,6 +72,12 @@
             background-color: #a3a3a3;
             color: rgb(0, 0, 0);
         }
+        .project {
+            margin-bottom: 15px;
+        }
+        label {
+            font-weight: bold;
+        }
     </style>
 </head>
 
@@ -112,8 +118,22 @@
         <div id="timesheetsView">
             <p>Lista de timesheets</p>
         </div>
+
         <div id="projectsView">
             <p>Lista de proyectos</p>
+
+            <table id="tablaProyectos">
+                <thead>
+                    <tr>
+                        <th>Client / Project</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Filas generadas dinámicamente -->
+                </tbody>
+            </table>
+            
         </div>
         <div id="aboutView">
             <p>

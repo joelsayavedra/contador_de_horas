@@ -1,6 +1,114 @@
 // -----------------------------------------------------------------------
 // ------------------------------- FUNCIONES -----------------------------
 // -----------------------------------------------------------------------
+
+let STATUS = {
+    SIN_STATUS: 0,
+    EN_DESARROLLO: 1,
+    LIBERADO_POR_QA: 2,
+    EN_PRODUCCION: 3
+}
+
+const statuses = [
+    { value: STATUS.SIN_STATUS, text: 'Sin status' },
+    { value: STATUS.EN_DESARROLLO, text: 'En desarrollo' },
+    { value: STATUS.LIBERADO_POR_QA, text: 'Liberado por QA' },
+    { value: STATUS.EN_PRODUCCION, text: 'En producción' }
+];
+
+let listaProyectos = async function(){
+
+    let clientesDict = await cargaClientesDict() || {};
+
+    // const projectsList = document.getElementById('projectsList');
+    // projectsList.innerHTML = '';  // Limpiar contenido previo
+
+    // for (const id in clientesDict) {
+    //   if (clientesDict.hasOwnProperty(id)) {
+    //     const project = clientesDict[id];
+        
+    //     // Crear el contenedor del proyecto
+    //     const projectDiv = document.createElement('div');
+    //     projectDiv.className = 'project';
+
+    //     // Crear el label con el nombre del proyecto
+    //     const label = document.createElement('label');
+    //     label.textContent = `${project.name}: `;
+
+    //     // Crear el select (combo box) para el status
+    //     const select = document.createElement('select');
+    //     select.id = `status-${id}`;
+
+    //     // Rellenar las opciones del select
+    //     statuses.forEach(status => {
+    //       const option = document.createElement('option');
+    //       option.value = status.value;
+    //       option.textContent = status.text;
+    //       if (status.value === project.status) {
+    //         option.selected = true;
+    //       }
+    //       select.appendChild(option);
+    //     });
+
+    //     // Evento para cambiar el status del proyecto
+    //     select.addEventListener('change', function() {
+    //       clientesDict[id].status = parseInt(this.value);
+    //       console.log(`El proyecto ${project.name} cambió a status ${this.value}`);
+    //     });
+
+    //     // Agregar el label y el select al div del proyecto
+    //     projectDiv.appendChild(label);
+    //     projectDiv.appendChild(select);
+    //     projectsList.appendChild(projectDiv);
+    //   }
+    // }
+
+    let tableBody = document.querySelector("#tablaProyectos tbody");
+    // Limpiar el contenido previo de la tabla
+    tableBody.innerHTML = "";
+    Object.keys(clientesDict).forEach((clienteId, index) => {
+        let cliente = clientesDict[clienteId];
+
+        let row = document.createElement("tr");
+        // Crear celdas para cada columna (nombre, edad, ciudad)
+        let cellCliente = document.createElement("td");
+        cellCliente.textContent = cliente?.name;
+        row.appendChild(cellCliente);
+        let cellStatus = document.createElement("td");
+
+        // Crear el select (combo box) para el status
+        const select = document.createElement('select');
+        select.id = `status-${clienteId}`;
+
+        // Rellenar las opciones del select
+        statuses.forEach(status => {
+            const option = document.createElement('option');
+            option.value = status.value;
+            option.textContent = status.text;
+            if (status.value === cliente?.status) {
+                option.selected = true;
+            }
+            select.appendChild(option);
+        });
+
+        // Evento para cambiar el status del proyecto
+        select.addEventListener('change', function () {
+            cliente.status = parseInt(this.value);
+            chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
+                console.log("Diccionario de clientes actualizado:", clientesDict);
+            });
+        });
+        cellStatus.appendChild(select);
+        row.appendChild(cellStatus);
+
+        tableBody.appendChild(row);
+        
+
+    });
+
+    
+}
+
 let writeRecorStatus = async function(message){
     document.getElementById("recordStatus").textContent = message;
 }
@@ -227,7 +335,10 @@ let getGroupedData = function (data) {
             let task = linea?.casetaskevent;
 
             if (!clientesDict[customer]) {
-                clientesDict[customer] = linea?.customer_display;
+                clientesDict[customer] = {
+                    name: linea?.customer_display,
+                    status: STATUS.SIN_STATUS
+                };
             }
 
             if (!tasksDict[task]) {
@@ -284,7 +395,7 @@ async function generarTabla() {
 
         // Crear celdas para cada columna (nombre, edad, ciudad)
         const cellCliente = document.createElement("td");
-        cellCliente.textContent = clientesDict[cliente];
+        cellCliente.textContent = clientesDict[cliente]?.name;
         row.appendChild(cellCliente);
         const cellTotal = document.createElement("td");
         cellTotal.textContent = clientes[cliente]?.total;
@@ -461,7 +572,11 @@ document.getElementById("actualizar").addEventListener("click", async function (
 
 let main = async function(){
     await validaRegistroActual();
+
+    // Tabla de totales
     await generarTabla();
+
+    await listaProyectos();
 
 }
 
