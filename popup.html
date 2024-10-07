@@ -78,6 +78,40 @@
         label {
             font-weight: bold;
         }
+
+        /* body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        } */
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(8, 50px);
+            grid-gap: 10px;
+            justify-content: center;
+        }
+
+        .week {
+            width: 50px;
+            height: 50px;
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* cursor: pointer; */
+            text-align: center;  /* Asegura que el texto esté centrado en líneas múltiples */
+            font-size: 12px;     /* Ajusta el tamaño de la fuente si es necesario */
+            line-height: 1;
+        }
+
+        .week.selected {
+            background-color: lightgreen;
+        }
     </style>
 </head>
 
@@ -116,7 +150,8 @@
         </div>
 
         <div id="timesheetsView">
-            <p>Lista de timesheets</p>
+            <h2 id="timesheetsViewTitle" style="text-align: center;">Lista de timesheets</h2>
+            <div class="grid" id="weeksGrid"></div>
         </div>
 
         <div id="projectsView">
@@ -137,7 +172,7 @@
         </div>
         <div id="aboutView">
             <p>
-                <a href="https://www.flaticon.com/free-icons/calendar" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
+                <a id="freepikLink" href="#" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
             </p>
         </div>
         

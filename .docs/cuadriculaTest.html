@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuadrícula de Semanas</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 20px;
+        }
+
+        h1 {
+            margin-bottom: 20px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(13, 50px);
+            grid-gap: 10px;
+            justify-content: center;
+        }
+
+        .week {
+            width: 50px;
+            height: 50px;
+            background-color: lightgray;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            /* cursor: pointer; */
+            text-align: center;  /* Asegura que el texto esté centrado en líneas múltiples */
+            font-size: 14px;     /* Ajusta el tamaño de la fuente si es necesario */
+            line-height: 1;
+        }
+
+        .week.selected {
+            background-color: lightgreen;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Cuadrícula de Semanas del Año</h1>
+    <div class="grid" id="weeksGrid"></div>
+
+    <script>
+        // Generar la cuadrícula de semanas
+        const weeksGrid = document.getElementById('weeksGrid');
+
+        for (let i = 1; i <= 52; i++) {
+            const weekDiv = document.createElement('div');
+            weekDiv.classList.add('week');
+            weekDiv.textContent = i;
+
+            // Evento para cambiar el color al hacer clic
+            weekDiv.addEventListener('click', function () {
+                this.classList.toggle('selected'); // Cambiar el color al hacer clic
+            });
+
+            weeksGrid.appendChild(weekDiv);
+        }
+    </script>
+
+</body>
+
+</html>

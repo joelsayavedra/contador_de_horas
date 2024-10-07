@@ -1,20 +1,133 @@
 // -----------------------------------------------------------------------
-// ------------------------------- FUNCIONES -----------------------------
+// ------------------------------ CONSTANTES -----------------------------
 // -----------------------------------------------------------------------
 
 let STATUS = {
     SIN_STATUS: 0,
     EN_DESARROLLO: 1,
     LIBERADO_POR_QA: 2,
-    EN_PRODUCCION: 3
-}
+    EN_PRODUCCION: 3,
+    OCULTAR: 4
+};
 
 const statuses = [
     { value: STATUS.SIN_STATUS, text: 'Sin status' },
     { value: STATUS.EN_DESARROLLO, text: 'En desarrollo' },
     { value: STATUS.LIBERADO_POR_QA, text: 'Liberado por QA' },
-    { value: STATUS.EN_PRODUCCION, text: 'En producción' }
+    { value: STATUS.EN_PRODUCCION, text: 'En producción' },
+    { value: STATUS.OCULTAR, text: 'Ocultar' }
 ];
+
+const MONTHS = [
+    'Jan',
+    'Feb',
+    'Mar',
+    'Apr',
+    'May',
+    'Jun',
+    'Jul',
+    'Aug',
+    'Sep',
+    'Oct',
+    'Nov',
+    'Dec',
+]
+
+  // -----------------------------------------------------------------------
+// ------------------------------- FUNCIONES -----------------------------
+// -----------------------------------------------------------------------
+
+
+function getWeeksOfYear(year) {
+    const weeks = [];
+    let startDate = new Date(year, 0, 1); // Comenzamos con el 1 de enero del año dado
+
+    // Ajustamos la fecha al lunes de la primera semana del año
+    const dayOfWeek = startDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ...)
+    const diffToSunday = 0 - dayOfWeek;
+    startDate.setDate(startDate.getDate() + diffToSunday);
+
+    console.log('startDate', startDate);
+
+    // Generar las semanas del año
+    while (
+        startDate.getFullYear() === year ||
+        (startDate.getFullYear() === year + 1 && startDate.getDate() === 1) ||
+        startDate.getFullYear() === year - 1
+    ) {
+        const weekStart = new Date(startDate);
+        const weekEnd = new Date(startDate);
+        weekEnd.setDate(weekEnd.getDate() + 6); // El domingo de la semana
+
+        // Añadir la semana (inicio y fin)
+        weeks.push({
+            start: new Date(weekStart),
+            end: new Date(weekEnd)
+        });
+
+        // Avanzamos al lunes de la siguiente semana
+        startDate.setDate(startDate.getDate() + 7);
+    }
+
+    return weeks;
+}
+
+let formatDate = (date) => {
+    try {
+        return MONTHS[date.getMonth()] +' '+ date.getDate()
+    } catch (error) {
+        console.error("Error formatDate: ");        
+        console.error(error);        
+    }
+};
+
+let parseDate = (date) => {
+    try {
+        const [dia, mes, año] = date.split('/');
+        return new Date(año, mes - 1, dia);
+    } catch (error) {
+        console.error("Error parseDate: ");        
+        console.error(error);        
+    }
+};
+
+let dibujaCuadricula = async function () {
+    let recordsData = await cargaRecordsData() || [];
+    let startDates = [];
+    recordsData.forEach(record => {
+        startDates.push(parseDate(record.startdate));
+    });
+
+    let year = (new Date()).getFullYear();
+    let weeksOfYear = getWeeksOfYear(year);
+    document.getElementById('timesheetsViewTitle').innerHTML = year+"";
+
+    // Generar la cuadrícula de semanas
+    const weeksGrid = document.getElementById('weeksGrid');
+
+    for (let i = 0; i < weeksOfYear.length; i++) {
+        const weekDiv = document.createElement('div');
+        weekDiv.classList.add('week');
+
+        let start = weeksOfYear?.[i]?.start;
+        let end = weeksOfYear?.[i]?.end;
+
+        weekDiv.innerHTML = formatDate(start)+" <br> to <br>"+formatDate(end);
+
+        if ( startDates.some(fecha => fecha.getTime() === start.getTime())) {
+            weekDiv.classList.add('selected'); // Cambiar el color al hacer clic
+        }
+
+
+
+        // Evento para cambiar el color al hacer clic
+        // weekDiv.addEventListener('click', function () {
+        //     this.classList.toggle('selected'); // Cambiar el color al hacer clic
+        // });
+
+        weeksGrid.appendChild(weekDiv);
+    }
+}
 
 let listaProyectos = async function(){
 
@@ -166,7 +279,7 @@ let validaRegistroActual = async function(){
                 return;
             }
 
-            let fecha = new Date;
+            // let fecha = new Date();
             if (timesheets?.includes(id)) {
                 writeRecorStatus('Record already counted');
                 // writeRecorStatus('Record already counted ('+fecha.toUTCString()+')');
@@ -476,6 +589,12 @@ let toggleDetalles = function(index) {
     }
 }
 
+document.getElementById('freepikLink').addEventListener('click', function() {
+    chrome.tabs.create({
+        url: 'https://www.flaticon.com/free-icons/calendar'
+    });
+  });
+
 // -----------------------------------------------------------------------
 // ----------------------------- EJECUCIÓN-- -----------------------------
 // -----------------------------------------------------------------------
@@ -567,7 +686,7 @@ document.getElementById("actualizar").addEventListener("click", async function (
 
     await updateLocalStorage(data);
 
-    // location.reload(); // DEBUG: Recargar el popup completamente 
+    location.reload(); // DEBUG: Recargar el popup completamente 
 });
 
 let main = async function(){
@@ -575,6 +694,8 @@ let main = async function(){
 
     // Tabla de totales
     await generarTabla();
+
+    await dibujaCuadricula();
 
     await listaProyectos();
 
