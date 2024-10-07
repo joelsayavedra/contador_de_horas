@@ -2,6 +2,7 @@
 // ------------------------------ CONSTANTES -----------------------------
 // -----------------------------------------------------------------------
 
+
 let STATUS = {
     SIN_STATUS: 0,
     EN_DESARROLLO: 1,
@@ -11,11 +12,11 @@ let STATUS = {
 };
 
 const statuses = [
-    { value: STATUS.SIN_STATUS, text: 'Sin status' },
-    { value: STATUS.EN_DESARROLLO, text: 'En desarrollo' },
-    { value: STATUS.LIBERADO_POR_QA, text: 'Liberado por QA' },
-    { value: STATUS.EN_PRODUCCION, text: 'En producción' },
-    { value: STATUS.OCULTAR, text: 'Ocultar' }
+    { value: STATUS.SIN_STATUS, text: 'Without status' },
+    { value: STATUS.EN_DESARROLLO, text: 'On development' },
+    { value: STATUS.LIBERADO_POR_QA, text: 'Approved by QA' },
+    { value: STATUS.EN_PRODUCCION, text: 'On production' },
+    { value: STATUS.OCULTAR, text: 'Hidden' }
 ];
 
 const MONTHS = [
@@ -32,6 +33,14 @@ const MONTHS = [
     'Nov',
     'Dec',
 ]
+
+let STATUS_COLORS = {
+    [STATUS.SIN_STATUS]:'white',
+    [STATUS.EN_DESARROLLO]:'Yellow',
+    [STATUS.LIBERADO_POR_QA]:'lightblue',
+    [STATUS.EN_PRODUCCION]:'LightGray',
+    [STATUS.OCULTAR]:'lightcoral',
+}
 
   // -----------------------------------------------------------------------
 // ------------------------------- FUNCIONES -----------------------------
@@ -133,49 +142,6 @@ let listaProyectos = async function(){
 
     let clientesDict = await cargaClientesDict() || {};
 
-    // const projectsList = document.getElementById('projectsList');
-    // projectsList.innerHTML = '';  // Limpiar contenido previo
-
-    // for (const id in clientesDict) {
-    //   if (clientesDict.hasOwnProperty(id)) {
-    //     const project = clientesDict[id];
-        
-    //     // Crear el contenedor del proyecto
-    //     const projectDiv = document.createElement('div');
-    //     projectDiv.className = 'project';
-
-    //     // Crear el label con el nombre del proyecto
-    //     const label = document.createElement('label');
-    //     label.textContent = `${project.name}: `;
-
-    //     // Crear el select (combo box) para el status
-    //     const select = document.createElement('select');
-    //     select.id = `status-${id}`;
-
-    //     // Rellenar las opciones del select
-    //     statuses.forEach(status => {
-    //       const option = document.createElement('option');
-    //       option.value = status.value;
-    //       option.textContent = status.text;
-    //       if (status.value === project.status) {
-    //         option.selected = true;
-    //       }
-    //       select.appendChild(option);
-    //     });
-
-    //     // Evento para cambiar el status del proyecto
-    //     select.addEventListener('change', function() {
-    //       clientesDict[id].status = parseInt(this.value);
-    //       console.log(`El proyecto ${project.name} cambió a status ${this.value}`);
-    //     });
-
-    //     // Agregar el label y el select al div del proyecto
-    //     projectDiv.appendChild(label);
-    //     projectDiv.appendChild(select);
-    //     projectsList.appendChild(projectDiv);
-    //   }
-    // }
-
     let tableBody = document.querySelector("#tablaProyectos tbody");
     // Limpiar el contenido previo de la tabla
     tableBody.innerHTML = "";
@@ -210,9 +176,17 @@ let listaProyectos = async function(){
             chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
                 console.log("Diccionario de clientes actualizado:", clientesDict);
             });
+            
+            listaProyectos();
+            generarTabla();
+
         });
         cellStatus.appendChild(select);
         row.appendChild(cellStatus);
+
+        // Color de la fila dependiendo del status
+        let status = clientesDict?.[clienteId]?.status;
+        row.style.backgroundColor = STATUS_COLORS[status];
 
         tableBody.appendChild(row);
         
@@ -333,7 +307,12 @@ let updateLocalStorage = async function(data){
     });
     
     // Actualiza diccionarios
-    clientesDict = {...clientesDict, ...groupedData?.clientesDict};
+    let clientesDictRecord = groupedData?.clientesDict;
+    for (const key in clientesDictRecord) {
+        if (!clientesDict.hasOwnProperty(key)) {
+            clientesDict[key] = clientesDictRecord[key];
+        }
+    }
     tasksDict = {...tasksDict, ...groupedData?.tasksDict};
     chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
         console.log("Diccionario de clientes actualizado:", clientesDict);
@@ -521,6 +500,13 @@ async function generarTabla() {
         boton.onclick = () => toggleDetalles(index); // Llama a la función para mostrar detalles
         accionCell.appendChild(boton);
         row.appendChild(accionCell);
+
+        // Color de la fila dependiendo del status
+        let status = clientesDict?.[cliente]?.status;
+        row.style.backgroundColor = STATUS_COLORS[status];
+        if (status===STATUS.OCULTAR) {
+            row.style.display = 'none';
+        }
 
         // Añadir la fila principal al cuerpo de la tabla
         tableBody.appendChild(row);
