@@ -113,6 +113,29 @@
         .week.selected {
             background-color: lightgreen;
         }
+        
+        #recordStatus{
+            font-weight: bolder;
+        }
+
+        #addRecord{
+            background-color: white;
+            border-color: green;
+        }
+        /* Cambia el estilo cuando se pasa el mouse por encima */
+        #addRecord:hover {
+            background-color: lightgreen; /* Cambia el color de fondo */
+        }
+
+        #deleteAllData, #deleteRecord{
+            background-color: white;
+            border-color: red;
+        }
+
+        /* Cambia el estilo cuando se pasa el mouse por encima */
+        #deleteAllData:hover, #deleteRecord:hover {
+            background-color: rgb(253, 169, 169); /* Cambia el color de fondo */
+        }
     </style>
 </head>
 
@@ -134,7 +157,9 @@
 
         <div id="grandTotalView">
             <p id="recordStatus">Record already counted: </p>
-            <button id="actualizar">Update counter with this record</button>
+            <button id="addRecord">Update counter with this record</button>
+            <button id="deleteRecord">Remove this record from counter</button>
+            <p></p>
         
             <table id="miTabla">
                 <thead>
@@ -156,11 +181,15 @@
         </div>
 
         <div id="projectsView">
-            <!-- <p>Lista de proyectos</p> -->
+            <p></p>
+            <button id="showAll">Show All</button>
+            <button id="hideAll">Hide All</button>
+            <p></p>
 
             <table id="tablaProyectos">
                 <thead>
                     <tr>
+                        <th>Show</th>
                         <th>Client / Project</th>
                         <th>Status</th>
                     </tr>
@@ -175,6 +204,7 @@
             <p>
                 <a id="freepikLink" href="#" title="calendar icons">Calendar icons created by Freepik - Flaticon</a>
             </p>
+            <button id="deleteAllData">Delete all data</button>
         </div>
         
     </div>

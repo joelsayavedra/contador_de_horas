@@ -8,7 +8,7 @@ let STATUS = {
     EN_DESARROLLO: 1,
     LIBERADO_POR_QA: 2,
     EN_PRODUCCION: 3,
-    OCULTAR: 4
+    STOPPED: 4
 };
 
 const statuses = [
@@ -16,7 +16,7 @@ const statuses = [
     { value: STATUS.EN_DESARROLLO, text: 'On development' },
     { value: STATUS.LIBERADO_POR_QA, text: 'Approved by QA' },
     { value: STATUS.EN_PRODUCCION, text: 'On production' },
-    { value: STATUS.OCULTAR, text: 'Hidden' }
+    { value: STATUS.STOPPED, text: 'Stopped' }
 ];
 
 const MONTHS = [
@@ -39,12 +39,42 @@ let STATUS_COLORS = {
     [STATUS.EN_DESARROLLO]:'Yellow',
     [STATUS.LIBERADO_POR_QA]:'lightblue',
     [STATUS.EN_PRODUCCION]:'LightGray',
-    [STATUS.OCULTAR]:'lightcoral',
+    [STATUS.STOPPED]:'lightcoral',
 }
 
   // -----------------------------------------------------------------------
 // ------------------------------- FUNCIONES -----------------------------
 // -----------------------------------------------------------------------
+
+let checkAll = async function(check){
+    let clientesDict = await cargaClientesDict() || {};
+    Object.keys(clientesDict).forEach(cliente => {
+        clientesDict[cliente].show = check;
+    });
+    chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
+        console.log("Diccionario de clientes actualizado:", clientesDict);
+    });
+    await listaProyectos();
+    await generarTabla();
+}
+
+let deleteAllData = async function(){
+    async function eliminarDato(clave) {
+        chrome.storage.local.remove(clave, () => {
+            if (chrome.runtime.lastError) {
+                console.error("Error al eliminar el dato:", chrome.runtime.lastError);
+            } else {
+                console.log(`Dato con la clave '${clave}' ha sido eliminado.`);
+            }
+        });
+    }
+
+    // Llamar a la función para eliminar un dato
+    await eliminarDato(TIMESHEETS);
+    await eliminarDato(RECORDS_DATA);
+    await eliminarDato(CLIENTES_DICT);
+    await eliminarDato(TASKS_DICT);
+}
 
 
 function getWeeksOfYear(year) {
@@ -147,18 +177,37 @@ let listaProyectos = async function(){
     tableBody.innerHTML = "";
     Object.keys(clientesDict).forEach((clienteId, index) => {
         let cliente = clientesDict[clienteId];
-
         let row = document.createElement("tr");
-        // Crear celdas para cada columna (nombre, edad, ciudad)
+
+        // Columna Show
+        let cellShow = document.createElement("td");
+        cellShow.style.textAlign = "center";       // Centrar horizontalmente
+        cellShow.style.verticalAlign = "middle";   // Centrar verticalmente
+        const checkbox = document.createElement('input');
+        checkbox.type = "checkbox";
+        checkbox.id = `checkbox-${clienteId}`;
+        checkbox.checked = cliente?.show;
+        checkbox.addEventListener('change', function () {
+            cliente.show = this.checked;
+            console.log({ show: this.checked })
+            chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
+                console.log("Diccionario de clientes actualizado:", clientesDict);
+            });
+            listaProyectos();
+            generarTabla();
+        });        
+        cellShow.appendChild(checkbox);
+        row.appendChild(cellShow);
+
+        // Columna de proyecto
         let cellCliente = document.createElement("td");
         cellCliente.textContent = cliente?.name;
         row.appendChild(cellCliente);
+        
+        // Columna status
         let cellStatus = document.createElement("td");
-
-        // Crear el select (combo box) para el status
         const select = document.createElement('select');
         select.id = `status-${clienteId}`;
-
         // Rellenar las opciones del select
         statuses.forEach(status => {
             const option = document.createElement('option');
@@ -169,17 +218,14 @@ let listaProyectos = async function(){
             }
             select.appendChild(option);
         });
-
         // Evento para cambiar el status del proyecto
         select.addEventListener('change', function () {
             cliente.status = parseInt(this.value);
             chrome.storage.local.set({[CLIENTES_DICT]:clientesDict},()=>{
                 console.log("Diccionario de clientes actualizado:", clientesDict);
             });
-            
             listaProyectos();
             generarTabla();
-
         });
         cellStatus.appendChild(select);
         row.appendChild(cellStatus);
@@ -196,8 +242,14 @@ let listaProyectos = async function(){
     
 }
 
-let writeRecorStatus = async function(message){
-    document.getElementById("recordStatus").textContent = message;
+let writeRecorStatus = async function(message, alreadyAdded){
+    let label = document.getElementById("recordStatus");
+    if (alreadyAdded) {
+        label.style.color = 'green';
+    }else{
+        label.style.color = 'red';
+    }
+    label.textContent = message;
 }
 
 let getGrandTotal = function(recordsData){
@@ -236,7 +288,6 @@ let getGrandTotal = function(recordsData){
 let validaRegistroActual = async function(){
     let timesheets = await cargaTimesheets();
 
-
     let urlString = "";
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
         if (tabs.length > 0) {
@@ -249,16 +300,16 @@ let validaRegistroActual = async function(){
 
             if (!id || id=='null') {
                 validRecord = false;
-                writeRecorStatus('Invalid record');
+                writeRecorStatus('Invalid record', false);
                 return;
             }
 
             // let fecha = new Date();
-            if (timesheets?.includes(id)) {
-                writeRecorStatus('Record already counted');
+            if (Object.keys(timesheets)?.includes(id)) {
+                writeRecorStatus('Record already counted', true);
                 // writeRecorStatus('Record already counted ('+fecha.toUTCString()+')');
             }else{
-                writeRecorStatus('This record has not been added');
+                writeRecorStatus('This record has not been added', false);
             }
         }
     });
@@ -269,7 +320,7 @@ let updateLocalStorage = async function(data){
         return;
     }
 
-    let timesheets = await cargaTimesheets() || [];
+    let timesheets = await cargaTimesheets() || {};
     let recordsData = await cargaRecordsData() || [];
     let clientesDict = await cargaClientesDict() || {};
     let tasksDict = await cargaTasksDict() || {};
@@ -286,18 +337,16 @@ let updateLocalStorage = async function(data){
     
     // Actualiza ids de timesheets
     // agrega el id si no existe
-    if(!timesheets?.includes(data?.id)){
+    if(!timesheets?.[data?.id]){
         // TODO: Agregar fecha
-        timesheets.push(data?.id);
+        timesheets[data?.id] = {
+            d: new Date()
+        };
     }
-    chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
-        console.log("Timsheets de storage actualizadas:", timesheets);
-        let fecha = new Date;
-        writeRecorStatus('Este registro se contabilizó ('+fecha.toUTCString()+')');
-    });
+    await saveTimesheets(timesheets);
     
     // Elimina el detalle anterior
-    if(timesheets?.includes(data?.id)){
+    if(Object.keys(timesheets)?.includes(data?.id)){
         recordsData = recordsData.filter(objeto => objeto.id !== data?.id);
     }
     recordsData.push(groupedData?.desglose);
@@ -380,6 +429,12 @@ let cargaTasksDict = async function(){
     });
 }
 
+let saveTimesheets = async function(timesheets){
+    await chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
+        console.log("Timsheets de storage actualizadas:", timesheets);
+    });
+}
+
 function sumarHoras(hora1, hora2) {
     // Separar las horas y minutos
     const [horas1, minutos1] = hora1.split(':').map(Number);
@@ -429,7 +484,8 @@ let getGroupedData = function (data) {
             if (!clientesDict[customer]) {
                 clientesDict[customer] = {
                     name: linea?.customer_display,
-                    status: STATUS.SIN_STATUS
+                    status: STATUS.SIN_STATUS,
+                    show: true
                 };
             }
 
@@ -504,7 +560,9 @@ async function generarTabla() {
         // Color de la fila dependiendo del status
         let status = clientesDict?.[cliente]?.status;
         row.style.backgroundColor = STATUS_COLORS[status];
-        if (status===STATUS.OCULTAR) {
+
+        let show = clientesDict?.[cliente]?.show;
+        if (!show) {
             row.style.display = 'none';
         }
 
@@ -659,7 +717,19 @@ const TASKS_DICT = "tasksDict";
 
 let validRecord = true;
 
-document.getElementById("actualizar").addEventListener("click", async function () {
+document.getElementById("showAll").addEventListener("click", async function () {
+    await checkAll(true);
+});
+document.getElementById("hideAll").addEventListener("click", async function () {
+    await checkAll(false);
+});
+
+document.getElementById("deleteAllData").addEventListener("click", async function () {
+    await deleteAllData();
+    location.reload();
+});
+
+document.getElementById("addRecord").addEventListener("click", async function () {
     if(!validRecord){
         return;
     }
@@ -687,24 +757,4 @@ let main = async function(){
 
 }
 
-
-
 main();
-
-
-
-// function eliminarDato(clave) {
-//     chrome.storage.local.remove(clave, () => {
-//         if (chrome.runtime.lastError) {
-//             console.error("Error al eliminar el dato:", chrome.runtime.lastError);
-//         } else {
-//             console.log(`Dato con la clave '${clave}' ha sido eliminado.`);
-//         }
-//     });
-// }
-
-// // Llamar a la función para eliminar un dato
-// eliminarDato(TIMESHEETS);
-// eliminarDato(RECORDS_DATA);
-// eliminarDato(CLIENTES_DICT);
-// eliminarDato(TASKS_DICT);
