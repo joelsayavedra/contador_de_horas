@@ -70,7 +70,6 @@ let deleteAllData = async function(){
     }
 
     // Llamar a la función para eliminar un dato
-    await eliminarDato(TIMESHEETS);
     await eliminarDato(RECORDS_DATA);
     await eliminarDato(CLIENTES_DICT);
     await eliminarDato(TASKS_DICT);
@@ -115,7 +114,7 @@ let formatDate = (date) => {
     try {
         return MONTHS[date.getMonth()] +' '+ date.getDate()
     } catch (error) {
-        console.error("Error formatDate: ");        
+        console.error("Error formatDate: ");
         console.error(error);        
     }
 };
@@ -131,9 +130,10 @@ let parseDate = (date) => {
 };
 
 let dibujaCuadricula = async function () {
-    let recordsData = await cargaRecordsData() || [];
+    let recordsData = await cargaRecordsData() || {};
     let startDates = [];
-    recordsData.forEach(record => {
+    Object.keys(recordsData).forEach(recordKey => {
+        let record = recordsData[recordKey];
         startDates.push(parseDate(record.startdate));
     });
 
@@ -255,7 +255,8 @@ let writeRecorStatus = async function(message, alreadyAdded){
 let getGrandTotal = function(recordsData){
     let grandTotal = {};
 
-    recordsData.forEach(record => {
+    Object.keys(recordsData).forEach(recordKey => {
+        let record = recordsData[recordKey];
         let clientes = record.clientes;
         Object.keys(clientes).forEach(clienteKey => {
             let cliente = clientes[clienteKey];
@@ -286,7 +287,7 @@ let getGrandTotal = function(recordsData){
 
 
 let validaRegistroActual = async function(){
-    let timesheets = await cargaTimesheets();
+    let recordsData = await cargaRecordsData() || {};
 
     let urlString = "";
     chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
@@ -296,7 +297,7 @@ let validaRegistroActual = async function(){
             const url = new URL(urlString);
             const params = url.searchParams;
             const id = params.get('id')+""; // "value1"
-            console.log({id, timesheets});
+            console.log('valida Registro Actual: ',{id, recordsData});
 
             if (!id || id=='null') {
                 validRecord = false;
@@ -304,10 +305,10 @@ let validaRegistroActual = async function(){
                 return;
             }
 
-            // let fecha = new Date();
-            if (Object.keys(timesheets)?.includes(id)) {
-                writeRecorStatus('Record already counted', true);
-                // writeRecorStatus('Record already counted ('+fecha.toUTCString()+')');
+            if (Object.keys(recordsData)?.includes(id)) {
+                // writeRecorStatus('Record already counted', true);
+                console.log('date: ', recordsData?.[id]?.date);
+                writeRecorStatus('Record already counted ('+recordsData?.[id]?.date+')', true);
             }else{
                 writeRecorStatus('This record has not been added', false);
             }
@@ -320,40 +321,22 @@ let updateLocalStorage = async function(data){
         return;
     }
 
-    let timesheets = await cargaTimesheets() || {};
-    let recordsData = await cargaRecordsData() || [];
+    let recordsData = await cargaRecordsData() || {};
     let clientesDict = await cargaClientesDict() || {};
     let tasksDict = await cargaTasksDict() || {};
     let groupedData = getGroupedData(data);
 
     console.log({
-        timesheets,
         recordsData,
         clientesDict,
         tasksDict,
         groupedData,
     });
-
     
-    // Actualiza ids de timesheets
-    // agrega el id si no existe
-    if(!timesheets?.[data?.id]){
-        // TODO: Agregar fecha
-        timesheets[data?.id] = {
-            d: new Date()
-        };
-    }
-    await saveTimesheets(timesheets);
-    
-    // Elimina el detalle anterior
-    if(Object.keys(timesheets)?.includes(data?.id)){
-        recordsData = recordsData.filter(objeto => objeto.id !== data?.id);
-    }
-    recordsData.push(groupedData?.desglose);
+    // Sobreescribe el detalle anterior
+    recordsData[data?.id] = (groupedData?.desglose);
     // Actualiza información detallada de la timesheet
-    chrome.storage.local.set({[RECORDS_DATA]:recordsData},()=>{
-        console.log("Detalles de transacciones actualizados:", recordsData);
-    });
+    await saveRecordsData(recordsData);
     
     // Actualiza diccionarios
     let clientesDictRecord = groupedData?.clientesDict;
@@ -428,10 +411,9 @@ let cargaTasksDict = async function(){
         });
     });
 }
-
-let saveTimesheets = async function(timesheets){
-    await chrome.storage.local.set({[TIMESHEETS]:timesheets},()=>{
-        console.log("Timsheets de storage actualizadas:", timesheets);
+let saveRecordsData = async function (recordsData) {
+    await chrome.storage.local.set({ [RECORDS_DATA]: recordsData }, () => {
+        console.log("Detalles de transacciones actualizados:", recordsData);
     });
 }
 
@@ -476,6 +458,7 @@ let getGroupedData = function (data) {
             hourstotal: data?.hourstotal,
             startdate: data?.startdate,
             clientes: {},
+            date: formatDate(new Date())
         };
         data?.lineas?.forEach(linea => {
             let customer = linea?.customer;
@@ -531,7 +514,7 @@ async function generarTabla() {
     // Limpiar el contenido previo de la tabla
     tableBody.innerHTML = "";
 
-    let recordsData = await cargaRecordsData() || [];
+    let recordsData = await cargaRecordsData() || {};
     let clientesDict = await cargaClientesDict() || {};
     let tasksDict = await cargaTasksDict() || {};
     let clientes = getGrandTotal(recordsData);
@@ -725,8 +708,33 @@ document.getElementById("hideAll").addEventListener("click", async function () {
 });
 
 document.getElementById("deleteAllData").addEventListener("click", async function () {
+    let confirm = window.confirm("ALL data wil be removed. Continue?");
+    if (!confirm) {
+        alert("Delete cancelled.");
+        return;
+    }
+    confirm = window.confirm("Are you sure?");
+    if (!confirm) {
+        alert("Delete cancelled.");
+        return;
+    }
     await deleteAllData();
+    alert("Data deleted successfully.");
     location.reload();
+});
+
+document.getElementById("removeRecord").addEventListener("click", async function () {
+    let recordsData = await cargaRecordsData();
+    let data = await cargaRecordInfo();
+
+    if (!data?.id || data.id=='null') {
+        return;
+    }
+
+    delete recordsData[data.id];
+
+    await saveRecordsData(recordsData);
+    location.reload(); // DEBUG: Recargar el popup completamente 
 });
 
 document.getElementById("addRecord").addEventListener("click", async function () {
@@ -737,8 +745,6 @@ document.getElementById("addRecord").addEventListener("click", async function ()
     let data = await cargaRecordInfo();
 
     console.log("Datos recuperados del storage:", data);
-
-    // let groupedData = getGroupedData();
 
     await updateLocalStorage(data);
 
