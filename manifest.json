@@ -1,6 +1,6 @@
 {
     "manifest_version": 3,
-    "name": "Netsoft time tracker",
+    "name": "Netsuite timesheet tracker",
     "version": "1.0",
     "description": "Extensión para obtener la suma del tiempo invertido por proyecto",
     "action": {
