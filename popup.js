@@ -168,6 +168,9 @@ let dibujaCuadricula = async function () {
     }
 }
 
+/**
+ * Dibuja la tabla de la pestaña "proyectos"
+ */
 let listaProyectos = async function(){
 
     let clientesDict = await cargaClientesDict() || {};
@@ -268,13 +271,21 @@ let getGrandTotal = function(recordsData){
 
                 // Combina tasks
                 let tasks = cliente?.tasks;
-                Object.keys(tasks).forEach(taksKey => {
-                    let task = tasks[taksKey];
-                    if(!grandTotal[clienteKey].tasks[taksKey]){
-                        grandTotal[clienteKey].tasks[taksKey] = task;
+                Object.keys(tasks).forEach(taskKey => {
+                    let task = tasks[taskKey];
+                    if(!grandTotal[clienteKey].tasks[taskKey]){
+                        grandTotal[clienteKey].tasks[taskKey] = task;
                     }else{
+
+                        console.log({task, taskKey});
+
+                        grandTotal[clienteKey].tasks[taskKey].d = {
+                            ...grandTotal[clienteKey].tasks[taskKey].d,
+                            ...task.d
+                        }
+                        
                         // Suma total de task
-                        grandTotal[clienteKey].tasks[taksKey].t = sumarHoras(grandTotal[clienteKey].tasks[taksKey].t, task.t);
+                        grandTotal[clienteKey].tasks[taskKey].t = sumarHoras(grandTotal[clienteKey].tasks[taskKey].t, task.t);
                     }
                 });
 
@@ -300,6 +311,7 @@ let validaRegistroActual = async function(){
             console.log('valida Registro Actual: ',{id, recordsData});
 
             if (!id || id=='null') {
+                // TODO: Agregar validación de url (que pertenezca a netsuite)
                 validRecord = false;
                 writeRecorStatus('Invalid record', false);
                 return;
@@ -334,7 +346,7 @@ let updateLocalStorage = async function(data){
     });
     
     // Sobreescribe el detalle anterior
-    recordsData[data?.id] = (groupedData?.desglose);
+    recordsData[data?.id] = groupedData?.desglose;
     // Actualiza información detallada de la timesheet
     await saveRecordsData(recordsData);
     
@@ -356,12 +368,14 @@ let updateLocalStorage = async function(data){
 
 };
 
+// Carga la información del registro tal cuál como se carga desde contentScript.js
 let cargaRecordInfo = async function(){
     return new Promise((resolve, reject) => {
         chrome.storage.local.get(RECORD_INFO, (result) => {
             if (chrome.runtime.lastError) {
                 reject(chrome.runtime.lastError);
             } else {
+                console.log({result});
                 resolve(result[RECORD_INFO]);
             }
         });
@@ -436,6 +450,36 @@ function sumarHoras(hora1, hora2) {
     return `${totalHoras}:${minutosFormateados}`;
 }
 
+function sumarDias(fechaStr, n) {
+    // Parsear la fecha en formato 'dd/mm/yyyy'
+    let [dia, mes, año] = fechaStr.split("/").map(Number);
+    
+    // Crear un objeto Date (restar 1 al mes porque en JS los meses van de 0 a 11)
+    let fecha = new Date(año, mes - 1, dia);
+    
+    // Sumar n días
+    fecha.setDate(fecha.getDate() + n);
+
+    // Formatear la fecha de vuelta a 'dd/mm/yyyy'
+    let nuevoDia = fecha.getDate().toString().padStart(2, '0'); // Asegura 2 dígitos
+    // let nuevoMes = (fecha.getMonth() + 1).toString().padStart(2, '0'); // Mes ajustado
+    let nuevoAño = fecha.getFullYear();
+
+    // Obtener el nombre del día de la semana y del mes
+    let diasSemana = ["Domingo", "Lunes", "Martes", "Miércoles", "Jueves", "Viernes", "Sábado"];
+    let meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+    let diaSemana = diasSemana[fecha.getDay()];
+    let nombreMes = meses[fecha.getMonth()];
+
+    return `${diaSemana} ${nuevoDia} de ${nombreMes} ${nuevoAño}`;
+}
+
+/**
+ * Convierte la información como la recibe contentScript a su versión resumida
+ * para su almacenamiento.
+ * @param {*} data 
+ * @returns 
+ */
 let getGroupedData = function (data) {
     try {
         const totalPorCliente = data.lineas.reduce(
@@ -464,6 +508,7 @@ let getGroupedData = function (data) {
             let customer = linea?.customer;
             let task = linea?.casetaskevent;
 
+            // Agrega clientes(proyectos) diferentes al diccionario
             if (!clientesDict[customer]) {
                 clientesDict[customer] = {
                     name: linea?.customer_display,
@@ -472,25 +517,46 @@ let getGroupedData = function (data) {
                 };
             }
 
+            // Agrega tareas diferentes al diccionario;
             if (!tasksDict[task]) {
                 tasksDict[task] = linea?.casetaskevent_display;
+            }
+
+
+
+            let taskDetail = {
+                t: linea?.hourstotal,
+                d:{}
+            }
+
+            for (let i = 0; i <= 6; i++) {
+
+                let h = linea?.['hours'+i];
+                if(!h){
+                    continue;
+                };
+
+                let f = sumarDias(data.startdate, i);
+                // let fecha=data.startdate+'-'+i;
+                let fechaArray = data.startdate.split('/');
+                taskDetail.d[fechaArray[2]+fechaArray[1]+fechaArray[0]+'-'+i] = {
+                    h,
+                    m: linea?.['memo' + i],
+                    f
+                }
             }
 
             if (!desglose?.clientes?.[customer]) {
                 desglose.clientes[customer] = {
 
                     tasks: {
-                        [task]: {
-                            t: linea?.hourstotal
-                        },
+                        [task]: taskDetail,
                     },
                     total: totalPorCliente[customer]
                 };
             } else {
                 if (!desglose.clientes[customer]?.tasks?.[task]) {
-                    desglose.clientes[customer].tasks[task] = {
-                        t: linea?.hourstotal
-                    };
+                    desglose.clientes[customer].tasks[task] = taskDetail;
                 }
             }
         });
@@ -507,7 +573,7 @@ let getGroupedData = function (data) {
     }
 }
 
-// Función para generar la tabla dinámica
+// Función para generar la tabla principal (Pestaña Total)
 async function generarTabla() {
     const tableBody = document.querySelector("#miTabla tbody");
 
@@ -518,6 +584,7 @@ async function generarTabla() {
     let clientesDict = await cargaClientesDict() || {};
     let tasksDict = await cargaTasksDict() || {};
     let clientes = getGrandTotal(recordsData);
+    console.log({clientes});
 
     // Recorrer el array de datos y generar las filas de la tabla
     Object.keys(clientes).forEach((cliente, index) => {
@@ -557,7 +624,9 @@ async function generarTabla() {
         detallesRow.classList.add("detalles"); // Oculta por defecto
 
 
-        // Creación de tabla interna
+        //#region  Creación de tabla interna
+
+        // Header de tabla interna
         const innerTable = document.createElement('table');
         innerTable.className = 'inner-table';
 
@@ -567,29 +636,114 @@ async function generarTabla() {
         subHeader1.textContent = 'Case/Task/Event';
         const subHeader2 = document.createElement('th');
         subHeader2.textContent = 'Time spent';
+        const subHeader3 = document.createElement('th');
+        subHeader3.textContent = 'Detail';
 
         innerHeaderRow.appendChild(subHeader1);
         innerHeaderRow.appendChild(subHeader2);
+        innerHeaderRow.appendChild(subHeader3);
         innerThead.appendChild(innerHeaderRow);
         innerTable.appendChild(innerThead);
-        innerTable.setAttribute("colspan", 4);
 
         // Crea el cuerpo de la tabla interna
         const innerTbody = document.createElement('tbody');
         let tasks = clientes[cliente].tasks;
-        Object.keys(tasks).forEach(task => {
+        Object.keys(tasks).forEach((taskId) => {
+            let task = tasks[taskId];
 
             let row1 = document.createElement('tr');
             let cell1Row1 = document.createElement('td');
-            cell1Row1.textContent = tasksDict[task];
+            cell1Row1.textContent = tasksDict[taskId];
             let cell2Row1 = document.createElement('td');
-            cell2Row1.textContent = tasks[task].t;
+            cell2Row1.textContent = task.t;
             row1.appendChild(cell1Row1);
             row1.appendChild(cell2Row1);
+
+            // Agregar celda con botón para desplegar detalles
+            const accionCell = document.createElement("td");
+            const boton = document.createElement("button");
+            boton.textContent = "Detail";
+            boton.onclick = () => toggleDetallesTask(taskId); // Llama a la función para mostrar detalles
+            accionCell.appendChild(boton);
+            row1.appendChild(accionCell);
+
             innerTbody.appendChild(row1);
+
+            //#region Tabla de detalles de task
+                        
+            // Tabla detalle task
+            const innerTaskTable = document.createElement('table');
+            innerTaskTable.className = 'inner-table';
+            
+            // Header
+            const innerThead = document.createElement('thead');
+            const innerHeaderRow = document.createElement('tr');
+            
+            const subHeader1 = document.createElement('th');
+            subHeader1.textContent = 'Fecha';
+            innerHeaderRow.appendChild(subHeader1);
+            const subHeader2 = document.createElement('th');
+            subHeader2.textContent = 'Horas';
+            innerHeaderRow.appendChild(subHeader2);
+            const subHeader3 = document.createElement('th');
+            subHeader3.textContent = 'Mensaje';
+            innerHeaderRow.appendChild(subHeader3);
+            
+            innerThead.appendChild(innerHeaderRow);
+            innerTaskTable.appendChild(innerThead);
+            
+            console.log({task});
+            let detalleTask = task?.d;
+            console.log({detalleTask});
+
+            const taskDetailBody = document.createElement('tbody');
+            Object.keys(detalleTask).forEach(detailId => {
+                
+                let detail = detalleTask[detailId];
+
+                let row = document.createElement('tr');
+
+                let cell1 = document.createElement('td');
+                cell1.textContent = detail.f;
+                row.appendChild(cell1);
+
+                let cell2 = document.createElement('td');
+                cell2.textContent = detail.h;
+                row.appendChild(cell2);
+
+                let cell3 = document.createElement('td');
+                cell3.innerHTML = detail.m.replaceAll('\n','<br>');
+                row.appendChild(cell3);
+       
+                taskDetailBody.appendChild(row);
+
+            });
+            
+            innerTaskTable.appendChild(taskDetailBody);
+
+            // Celda que contendrá la Tabla completa
+            const detallesCell = document.createElement("td");
+            detallesCell.setAttribute("colspan", 3); // Hace que ocupe todas las columnas
+            detallesCell.appendChild(innerTaskTable);
+            
+            // Crear una fila extra para los detalles (inicialmente oculta)
+            const detallesTaskRow = document.createElement("tr");
+            detallesTaskRow.classList.add("detallesTask"); // Oculta por defecto
+            detallesTaskRow.id = taskId;
+            detallesTaskRow.appendChild(detallesCell);
+
+            innerTbody.appendChild(detallesTaskRow);
+            
+
+            //#endregion
+
             // detallesCell.textContent = tasksDict[task];
         });
         innerTable.appendChild(innerTbody);
+
+
+
+        //#endregion
         
         const detallesCell = document.createElement("td");
         detallesCell.appendChild(innerTable);
@@ -604,9 +758,22 @@ async function generarTabla() {
     });
 }
 
+// Muesta u oculta los detalles de un proyecto
 let toggleDetalles = function(index) {
     const detallesRows = document.querySelectorAll(".detalles");
     const detallesRow = detallesRows[index];
+
+    // Alternar visibilidad de la fila de detalles
+    if (detallesRow.style.display === "none" || !detallesRow.style.display) {
+        detallesRow.style.display = "table-row"; // Mostrar detalles
+    } else {
+        detallesRow.style.display = "none"; // Ocultar detalles
+    }
+}
+
+// Muestra u oculta los detalles de una tarea
+let toggleDetallesTask = function(taskId) {
+    const detallesRow = document.getElementById(taskId);
 
     // Alternar visibilidad de la fila de detalles
     if (detallesRow.style.display === "none" || !detallesRow.style.display) {
@@ -737,6 +904,7 @@ document.getElementById("removeRecord").addEventListener("click", async function
     location.reload(); // DEBUG: Recargar el popup completamente 
 });
 
+// Evento al presionar el borón "Update"
 document.getElementById("addRecord").addEventListener("click", async function () {
     if(!validRecord){
         return;
@@ -748,6 +916,7 @@ document.getElementById("addRecord").addEventListener("click", async function ()
 
     await updateLocalStorage(data);
 
+    debugger;
     location.reload(); // DEBUG: Recargar el popup completamente 
 });
 

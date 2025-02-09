@@ -1,10 +1,28 @@
-let recordsData = [
-    {
+console.clear();
+let recordsData = {
+    1:{
         "clientes": {
             "58148": {
                 "tasks": {
                     "1022441": {
-                        "t": "3:00"
+                        "t": "3:00",
+                        "d":{
+                            "20250126-3": {
+                                "h": "1:30",
+                                "m": "1h: Error con motor de plantillas, se valida impresión de factura con 52 artículos, el error sigue siendo esporádico.\n0.5h: Revisión de error en Descarga Masiva SAT con Griver. Error en política de CORS.",
+                                "f": "Miércoles 29 de Enero 2025"
+                            },
+                            "20250126-4": {
+                                "h": "1:00",
+                                "m": "Cotización GAL | Integración Básculas Camioneras",
+                                "f": "Jueves 30 de Enero 2025"
+                            },
+                            "20250126-5": {
+                                "h": "0:30",
+                                "m": "Cortización POS Quadrum.",
+                                "f": "Viernes 31 de Enero 2025"
+                            }
+                        }
                     },
                     "2200459": {
                         "t": "4:30"
@@ -57,12 +75,39 @@ let recordsData = [
         "startdate": "22/09/2024",
         "workcalendarhours": "40"
     },
-    {
+    2:{
         "clientes": {
             "58148": {
                 "tasks": {
                     "1022441": {
-                        "t": "8:30"
+                        "t": "8:30",
+                        "d": {
+                            "20250127-1": {
+                                "h": "1:00",
+                                "m": "Revisión integraciones.\nRetroalimentación.",
+                                "f": "Lunes 27 de Enero 2025"
+                            },
+                            "20250127-2": {
+                                "h": "0:30",
+                                "m": "Revisión integraciones.",
+                                "f": "Martes 28 de Enero 2025"
+                            },
+                            "20250127-3": {
+                                "h": "0:30",
+                                "m": "Revisión integraciones.",
+                                "f": "Miércoles 29 de Enero 2025"
+                            },
+                            "20250127-4": {
+                                "h": "0:30",
+                                "m": "Revisión integraciones.",
+                                "f": "Jueves 30 de Enero 2025"
+                            },
+                            "20250127-5": {
+                                "h": "6:00",
+                                "m": "0.5h Revisión integraciones.\n5.5h Kick Off.",
+                                "f": "Viernes 31 de Enero 2025"
+                            }
+                        }
                     },
                     "2200459": {
                         "t": "2:30"
@@ -104,7 +149,7 @@ let recordsData = [
         "startdate": "15/09/2024",
         "workcalendarhours": "32"
     },
-    {
+    3:{
         "id": "102873",
         "workcalendarhours": "40",
         "enddate": "14/09/2024",
@@ -153,7 +198,7 @@ let recordsData = [
             }
         }
     }
-]
+}
 
 function sumarHoras(hora1, hora2) {
     // Separar las horas y minutos
@@ -177,9 +222,9 @@ function sumarHoras(hora1, hora2) {
 let getGrandTotal = function(recordsData){
     let grandTotal = {};
 
-    recordsData.forEach(record => {
+    Object.keys(recordsData).forEach(recordKey => {
+        let record = recordsData[recordKey];
         let clientes = record.clientes;
-        console.log({clientes});
         Object.keys(clientes).forEach(clienteKey => {
             let cliente = clientes[clienteKey];
             if(!grandTotal[clienteKey]){
@@ -190,13 +235,21 @@ let getGrandTotal = function(recordsData){
 
                 // Combina tasks
                 let tasks = cliente?.tasks;
-                Object.keys(tasks).forEach(taksKey => {
-                    let task = tasks[taksKey];
-                    if(!grandTotal[clienteKey].tasks[taksKey]){
-                        grandTotal[clienteKey].tasks[taksKey] = task;
+                Object.keys(tasks).forEach(taskKey => {
+                    let task = tasks[taskKey];
+                    if(!grandTotal[clienteKey].tasks[taskKey]){
+                        grandTotal[clienteKey].tasks[taskKey] = task;
                     }else{
+
+                        console.log({task, taskKey});
+
+                        grandTotal[clienteKey].tasks[taskKey].d = {
+                            ...grandTotal[clienteKey].tasks[taskKey].d,
+                            ...task.d
+                        }
+                        
                         // Suma total de task
-                        grandTotal[clienteKey].tasks[taksKey].t = sumarHoras(grandTotal[clienteKey].tasks[taksKey].t, task.t);
+                        grandTotal[clienteKey].tasks[taskKey].t = sumarHoras(grandTotal[clienteKey].tasks[taskKey].t, task.t);
                     }
                 });
 
@@ -208,4 +261,5 @@ let getGrandTotal = function(recordsData){
 }
 
 let grandTotal = getGrandTotal(recordsData);
-console.log(JSON.stringify(grandTotal, null, 4));
+console.log(grandTotal);
+// console.log(JSON.stringify(grandTotal, null, 4));
