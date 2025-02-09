@@ -132,40 +132,56 @@ let parseDate = (date) => {
 let dibujaCuadricula = async function () {
     let recordsData = await cargaRecordsData() || {};
     let startDates = [];
+    let years = [];
     Object.keys(recordsData).forEach(recordKey => {
         let record = recordsData[recordKey];
-        startDates.push(parseDate(record.startdate));
+        let date = parseDate(record.startdate);
+        startDates.push(date);
+        let year = date.getFullYear();
+        if (!years.includes(year)) {
+            years.push(year)
+        }
+    });
+    // console.log({startDates});
+    // console.log({years});
+
+    
+    years.forEach(year => {
+        let weeksOfYear = getWeeksOfYear(year);
+        
+        let titulo = document.createElement("h2");
+        titulo.style.textAlign = "center"; // Agregar estilo de alineación
+        titulo.innerHTML = year+"";
+        timesheetsView.appendChild(titulo);
+        
+        // Generar la cuadrícula de semanas
+        const weeksGrid = document.createElement("div");
+        weeksGrid.classList.add("grid");
+        weeksGrid.id = "weeksGrid";
+        timesheetsView.appendChild(weeksGrid);
+    
+        for (let i = 0; i < weeksOfYear.length; i++) {
+            const weekDiv = document.createElement('div');
+            weekDiv.classList.add('week');
+    
+            let start = weeksOfYear?.[i]?.start;
+            let end = weeksOfYear?.[i]?.end;
+    
+            weekDiv.innerHTML = formatDate(start)+" <br> to <br>"+formatDate(end);
+    
+            if ( startDates.some(fecha => fecha.getTime() === start.getTime())) {
+                weekDiv.classList.add('selected'); // Cambiar el color al hacer clic
+            }
+    
+            // // Evento para cambiar el color al hacer clic
+            // weekDiv.addEventListener('click', function () {
+            //     this.classList.toggle('selected'); // Cambiar el color al hacer clic
+            // });
+    
+            weeksGrid.appendChild(weekDiv);
+        }
     });
 
-    let year = (new Date()).getFullYear();
-    let weeksOfYear = getWeeksOfYear(year);
-    document.getElementById('timesheetsViewTitle').innerHTML = year+"";
-
-    // Generar la cuadrícula de semanas
-    const weeksGrid = document.getElementById('weeksGrid');
-
-    for (let i = 0; i < weeksOfYear.length; i++) {
-        const weekDiv = document.createElement('div');
-        weekDiv.classList.add('week');
-
-        let start = weeksOfYear?.[i]?.start;
-        let end = weeksOfYear?.[i]?.end;
-
-        weekDiv.innerHTML = formatDate(start)+" <br> to <br>"+formatDate(end);
-
-        if ( startDates.some(fecha => fecha.getTime() === start.getTime())) {
-            weekDiv.classList.add('selected'); // Cambiar el color al hacer clic
-        }
-
-
-
-        // Evento para cambiar el color al hacer clic
-        // weekDiv.addEventListener('click', function () {
-        //     this.classList.toggle('selected'); // Cambiar el color al hacer clic
-        // });
-
-        weeksGrid.appendChild(weekDiv);
-    }
 }
 
 /**
@@ -276,8 +292,6 @@ let getGrandTotal = function(recordsData){
                     if(!grandTotal[clienteKey].tasks[taskKey]){
                         grandTotal[clienteKey].tasks[taskKey] = task;
                     }else{
-
-                        console.log({task, taskKey});
 
                         grandTotal[clienteKey].tasks[taskKey].d = {
                             ...grandTotal[clienteKey].tasks[taskKey].d,
@@ -692,9 +706,7 @@ async function generarTabla() {
             innerThead.appendChild(innerHeaderRow);
             innerTaskTable.appendChild(innerThead);
             
-            console.log({task});
             let detalleTask = task?.d;
-            console.log({detalleTask});
 
             const taskDetailBody = document.createElement('tbody');
             Object.keys(detalleTask).forEach(detailId => {
