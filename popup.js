@@ -8,7 +8,10 @@ let STATUS = {
     EN_DESARROLLO: 1,
     LIBERADO_POR_QA: 2,
     EN_PRODUCCION: 3,
-    STOPPED: 4
+    STOPPED: 4,
+    SUPPORT: 5,
+    QUOTE: 6,
+    BACKLOG: 7,
 };
 
 const statuses = [
@@ -16,7 +19,10 @@ const statuses = [
     { value: STATUS.EN_DESARROLLO, text: 'On development' },
     { value: STATUS.LIBERADO_POR_QA, text: 'Approved by QA' },
     { value: STATUS.EN_PRODUCCION, text: 'On production' },
-    { value: STATUS.STOPPED, text: 'Stopped' }
+    { value: STATUS.STOPPED, text: 'Stopped' },
+    { value: STATUS.SUPPORT, text: 'Support' },
+    { value: STATUS.QUOTE, text: 'Quote' },
+    { value: STATUS.BACKLOG, text: 'Backlog' },
 ];
 
 const MONTHS = [
@@ -37,10 +43,14 @@ const MONTHS = [
 let STATUS_COLORS = {
     [STATUS.SIN_STATUS]:'white',
     [STATUS.EN_DESARROLLO]:'Yellow',
-    [STATUS.LIBERADO_POR_QA]:'lightblue',
+    [STATUS.QUOTE]:'lightblue',
     [STATUS.EN_PRODUCCION]:'LightGray',
     [STATUS.STOPPED]:'lightcoral',
+    [STATUS.SUPPORT]:'gray',
+    [STATUS.LIBERADO_POR_QA]:'palegreen',
+    [STATUS.BACKLOG]:'lightgoldenrodyellow',
 }
+// http://davidbau.com/colors/
 
   // -----------------------------------------------------------------------
 // ------------------------------- FUNCIONES -----------------------------
@@ -79,13 +89,13 @@ let deleteAllData = async function(){
 function getWeeksOfYear(year) {
     const weeks = [];
     let startDate = new Date(year, 0, 1); // Comenzamos con el 1 de enero del año dado
+    // console.log('startDate', startDate);
 
     // Ajustamos la fecha al lunes de la primera semana del año
     const dayOfWeek = startDate.getDay(); // Obtiene el día de la semana (0 = domingo, 1 = lunes, ...)
     const diffToSunday = 0 - dayOfWeek;
     startDate.setDate(startDate.getDate() + diffToSunday);
 
-    console.log('startDate', startDate);
 
     // Generar las semanas del año
     while (
@@ -598,7 +608,6 @@ async function generarTabla() {
     let clientesDict = await cargaClientesDict() || {};
     let tasksDict = await cargaTasksDict() || {};
     let clientes = getGrandTotal(recordsData);
-    console.log({clientes});
 
     // Recorrer el array de datos y generar las filas de la tabla
     Object.keys(clientes).forEach((cliente, index) => {
